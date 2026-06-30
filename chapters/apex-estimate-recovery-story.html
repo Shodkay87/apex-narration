@@ -1485,17 +1485,17 @@ btnReplay.addEventListener('click', replayDemo);
 
   function setStartBtn(show){ if(!CFG.startBtnSel) return; var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display = show ? "" : "none"; }
   (function(){ var st=document.createElement('style');
-    st.textContent='#screen-summary .rr-card,#screen-summary .stats-row,#screen-summary .ghl-card{animation:none;}'+
-      '.apex-cpan-pre{opacity:0;transform:translateY(-32px);transition:none;}'+
-      '.apex-cpan-in{opacity:1;transform:translateY(0);transition:opacity 0.75s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.75s cubic-bezier(0.25,0.46,0.45,0.94);}';
+    st.textContent='#screen-summary .rr-card,#screen-summary .stats-row,#screen-summary .ghl-card,#screen-summary .recovery-grid,#screen-summary .cta-card{animation:none;}'+
+      '.apex-cpan-pre{opacity:0;transform:translateY(44px);transition:none;}'+
+      '.apex-cpan-in{opacity:1;transform:translateY(0);transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1);}';
     document.head.appendChild(st); })();
 
-  var REVEAL_GROUPS = ['#screen-summary .rr-card','#screen-summary .stats-row','#screen-summary .ghl-card'];
+  var REVEAL_GROUPS = ['#screen-summary .rr-card','#screen-summary .stats-row','#screen-summary .ghl-card','#screen-summary .recovery-grid','#screen-summary .cta-card'];
   var REVEAL_SEL = REVEAL_GROUPS.join(',');
   function revealCards(){
     if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setTimeout(function(){
-      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('apex-cpan-pre'); el.classList.add('apex-cpan-in'); }); }); }); }, g*300); });
+      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('apex-cpan-pre'); el.classList.add('apex-cpan-in'); }); }); }); }, g*480); });
     }, 800);
   }
   function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-pre','apex-cpan-in'); }); }
