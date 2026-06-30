@@ -2077,7 +2077,8 @@
   function wrappedStart(){
     onReset();
     setStartBtn(false);
-    playSeg(CFG.introSrc).then(function(){ if(typeof origStart==="function") origStart(); });
+    // T3: start experience immediately — narration plays when screen-demo appears (during comparison)
+    if(typeof origStart==="function") origStart();
   }
   if(typeof origStart==="function"){ window[CFG.startFn] = wrappedStart; }
   if(CFG.rebindStartSel){
@@ -2089,7 +2090,9 @@
   if(typeof origShow==="function"){
     window.showScreen = function(id){
       var r = origShow.apply(this, arguments);
-      if(id===CFG.summaryId) onComplete();
+      // T3: play intro narration when comparison begins, not before experience starts
+      if(id==='screen-demo') playSeg(CFG.introSrc);
+      else if(id===CFG.summaryId) onComplete();
       else if(id===CFG.introScreenId) onReset();
       return r;
     };
@@ -2099,6 +2102,17 @@
     var o = window[fn];
     if(typeof o==="function"){ window[fn] = function(){ onReset(); return o.apply(this, arguments); }; }
   });
+
+  // T1: pause/resume narration audio alongside demo controls
+  var _origToggle = window.togglePause;
+  if(typeof _origToggle==='function'){
+    window.togglePause = function(){
+      var narPlaying = !!audio.src && !audio.paused;
+      _origToggle.apply(this, arguments);
+      if(narPlaying){ try{ audio.pause(); }catch(e){} }
+      else if(audio.src && audio.paused){ try{ audio.play().catch(function(){}); }catch(e){} }
+    };
+  }
 })();
 </script>
 </body>

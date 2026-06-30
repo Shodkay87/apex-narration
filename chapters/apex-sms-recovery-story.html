@@ -1281,8 +1281,15 @@ function restart() {
   function showContinue(){ var w = ensureContinue(); requestAnimationFrame(function(){ w.classList.add("is-on"); }); }
   function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
 
-  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); }
-  function onReset(){ hideContinue(); stopNar(); }
+  var REVEAL_SEL = '#s-summary .rr-card, #s-summary .stats-row, #s-summary .contact-card, #s-summary .pipeline-wrap';
+  function revealCards(){
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var els=document.querySelectorAll(REVEAL_SEL);
+    els.forEach(function(el,i){ el.style.opacity='0'; el.style.transform='translateY(14px)'; el.style.transition='opacity 0.55s ease,transform 0.55s ease'; setTimeout(function(){ el.style.opacity=''; el.style.transform=''; }, 180+i*210); });
+  }
+  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.style.opacity=''; el.style.transform=''; el.style.transition=''; }); }
+  function onComplete(){ revealCards(); showContinue(); playSeg(CFG.resultSrc); }
+  function onReset(){ hideContinue(); stopNar(); clearReveal(); }
 
   var origStart = window[CFG.startFn];
   function wrappedStart(){
@@ -1310,6 +1317,17 @@ function restart() {
     var o = window[fn];
     if(typeof o==="function"){ window[fn] = function(){ onReset(); return o.apply(this, arguments); }; }
   });
+
+  // T1: pause/resume narration audio alongside demo controls
+  var _origToggle = window.togglePause;
+  if(typeof _origToggle==='function'){
+    window.togglePause = function(){
+      var narPlaying = !!audio.src && !audio.paused;
+      _origToggle.apply(this, arguments);
+      if(narPlaying){ try{ audio.pause(); }catch(e){} }
+      else if(audio.src && audio.paused){ try{ audio.play().catch(function(){}); }catch(e){} }
+    };
+  }
 })();
 </script>
 </body>

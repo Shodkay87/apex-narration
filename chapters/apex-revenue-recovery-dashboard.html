@@ -746,5 +746,57 @@
 
   </div><!-- end .dash-canvas -->
 
+<script>
+(function(){
+  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function easeOut(t){ return 1 - Math.pow(1 - t, 3); }
+
+  // Sequential card reveal
+  var sections = ['.hero-metric', '.metrics-row', '.channel-card', '.opp-card', '.dash-footer-banner']
+    .map(function(s){ return document.querySelector(s); }).filter(Boolean);
+
+  if (!rm) {
+    sections.forEach(function(el, i){
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(10px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      setTimeout(function(){ el.style.opacity = ''; el.style.transform = ''; }, 80 + i * 90);
+    });
+  }
+
+  // Count-up: hero metric $37,800
+  var heroEl = document.querySelector('.hero-metric__value');
+  if (heroEl && !rm) {
+    var heroTarget = 37800;
+    heroEl.textContent = '$0';
+    setTimeout(function(){
+      var t0 = performance.now(), dur = 1800;
+      (function step(now){
+        var p = Math.min((now - t0) / dur, 1);
+        heroEl.textContent = '$' + Math.round(easeOut(p) * heroTarget).toLocaleString();
+        if (p < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }, 200);
+  }
+
+  // Count-up: metric card numeric values
+  if (!rm) {
+    var metricEls = document.querySelectorAll('.metric-card__value--cyan, .metric-card__value--amber, .metric-card__value--green');
+    metricEls.forEach(function(el, i){
+      var target = parseInt(el.textContent, 10);
+      if (isNaN(target)) return;
+      el.textContent = '0';
+      setTimeout(function(){
+        var t0 = performance.now(), dur = 900;
+        (function step(now){
+          var p = Math.min((now - t0) / dur, 1);
+          el.textContent = Math.round(easeOut(p) * target);
+          if (p < 1) requestAnimationFrame(step);
+        })(performance.now());
+      }, 460 + i * 55);
+    });
+  }
+})();
+</script>
 </body>
 </html>
