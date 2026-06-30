@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Ridge Roofing — Revenue Recovery Dashboard | Apex AI</title>
+  <!--
+    ============================================================
+    STANDALONE DASHBOARD FILE
+    Designed to render cleanly at 1920×1080 for:
+    - Screen recording
+    - Demo screenshots
+    - Framer embed as a single custom HTML section
+
+    To screenshot at 1920×1080:
+      1. Open in Chrome/Edge
+      2. DevTools → toggle device toolbar → set 1920×1080 custom
+      3. Or use: puppeteer / playwright headless screenshot
+    ============================================================
+  -->
+  <style>
+    /* ============================================
+       CSS VARIABLES — APEX BRAND SYSTEM
+       ============================================ */
+    :root {
+      --bg-primary:     #080b12;
+      --bg-secondary:   #0e1320;
+      --bg-card:        #131a28;
+      --bg-card-hover:  #1c2840;
+
+      --accent-cyan:    #22d3ee;
+      --accent-blue:    #3b82f6;
+      --accent-glow:    rgba(34, 211, 238, 0.12);
+
+      --color-green:    #22c55e;
+      --color-green-bg: rgba(34, 197, 94, 0.1);
+      --color-amber:    #f59e0b;
+      --color-amber-bg: rgba(245, 158, 11, 0.1);
+      --color-red:      #ef4444;
+
+      --text-primary:   #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted:     #64748b;
+
+      --border:         rgba(255,255,255,0.07);
+      --border-accent:  rgba(34, 211, 238, 0.22);
+
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  20px;
+
+      --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono:  'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================
+       DASHBOARD SHELL
+       1920×1080 target canvas
+       ============================================ */
+    .dash-canvas {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg-primary);
+      padding: 40px 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .dash-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .dash-header__logo-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .dash-header__logo-mark {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 15px;
+      color: #fff;
+      letter-spacing: -0.05em;
+      flex-shrink: 0;
+    }
+
+    .dash-header__brand {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .dash-header__title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .dash-header__sub {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .dash-header__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .dash-header__period {
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+    }
+
+    .dash-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-green);
+      background: var(--color-green-bg);
+      border: 1px solid rgba(34,197,94,0.22);
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+    }
+
+    .dash-status__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--color-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ============================================
+       HERO METRIC — $37,800
+       ============================================ */
+    .hero-metric {
+      background: linear-gradient(145deg, #0c1924, #0b1520);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: var(--radius-lg);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-metric::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 90% at 80% 50%, rgba(34,197,94,0.09) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-metric::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(34,197,94,0.04);
+      pointer-events: none;
+    }
+
+    .hero-metric__left {}
+
+    .hero-metric__label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-green);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-metric__label::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--color-green);
+      box-shadow: 0 0 10px var(--color-green);
+    }
+
+    .hero-metric__value {
+      font-size: 88px;
+      font-weight: 900;
+      color: var(--color-green);
+      letter-spacing: -0.05em;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .hero-metric__period {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .hero-metric__right {
+      text-align: right;
+      z-index: 1;
+    }
+
+    .hero-metric__change {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--color-green);
+      margin-bottom: 6px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-metric__change-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .hero-metric__divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(34,197,94,0.15);
+      margin: 0 0 20px;
+    }
+
+    .hero-metric__pills {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .hero-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .hero-pill__val {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 15px;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* ============================================
+       METRIC CARDS — 7 SUPPORTING METRICS
+       ============================================ */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 18px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .metric-card:hover { border-color: var(--border-accent); }
+
+    .metric-card__icon {
+      font-size: 20px;
+    }
+
+    .metric-card__value {
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-card__value--cyan  { color: var(--accent-cyan); }
+    .metric-card__value--green { color: var(--color-green); }
+    .metric-card__value--amber { color: var(--color-amber); }
+
+    .metric-card__label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .metric-card__trend {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-green);
+      margin-top: auto;
+    }
+
+    /* ============================================
+       BOTTOM ROW: CHANNELS + TABLE
+       ============================================ */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 22px;
+    }
+
+    /* Channel breakdown */
+    .channel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+    }
+
+    .channel-card__title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+
+    .ch-bar { margin-bottom: 18px; }
+
+    .ch-bar__header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+
+    .ch-bar__name  { font-size: 13px; color: var(--text-secondary); }
+    .ch-bar__value { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+    .ch-bar__track {
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .ch-bar__fill {
+      height: 100%;
+      border-radius: 100px;
+    }
+
+    .ch-bar__fill--cyan  { background: linear-gradient(90deg, #22d3ee, #7dd3fc); }
+    .ch-bar__fill--green { background: linear-gradient(90deg, #22c55e, #86efac); }
+    .ch-bar__fill--amber { background: linear-gradient(90deg, #f59e0b, #fde68a); }
+    .ch-bar__fill--blue  { background: linear-gradient(90deg, #3b82f6, #a5b4fc); }
+
+    /* Opportunities table card */
+    .opp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .opp-card__header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .opp-card__title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .opp-card__count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr {
+      background: rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    tbody td {
+      padding: 14px 20px;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .td-name { font-weight: 700; }
+    .td-source {
+      font-size: 12px;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+    }
+    .td-value {
+      font-weight: 800;
+      color: var(--color-green);
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge--green { background: var(--color-green-bg); color: var(--color-green); border: 1px solid rgba(34,197,94,0.2); }
+    .badge--amber { background: var(--color-amber-bg); color: var(--color-amber); border: 1px solid rgba(245,158,11,0.2); }
+    .badge--cyan  { background: rgba(34,211,238,0.08); color: var(--accent-cyan); border: 1px solid rgba(34,211,238,0.2); }
+
+    /* ============================================
+       FOOTER BANNER
+       ============================================ */
+    .dash-footer-banner {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+
+    .dash-footer-banner strong {
+      color: var(--text-secondary);
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ============================================
+       RESPONSIVE (for mobile/tablet use)
+       1920×1080 is the primary target — responsiveness
+       is provided for reference/Framer use.
+       ============================================ */
+    @media (max-width: 1400px) {
+      .metrics-row { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .dash-canvas    { padding: 24px 20px; }
+      .metrics-row    { grid-template-columns: repeat(2, 1fr); }
+      .bottom-row     { grid-template-columns: 1fr; }
+      .hero-metric    { flex-direction: column; gap: 28px; }
+      .hero-metric__right { text-align: left; align-self: stretch; }
+      .hero-metric__pills { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!--
+    ================================================
+    APEX REVENUE RECOVERY DASHBOARD
+    Blue Ridge Roofing & Restoration
+    Standalone file — copy this entire page
+    into Framer as a Custom Code embed.
+
+    1920×1080 screenshot target:
+      Open Chrome → DevTools → Toggle device toolbar
+      → Custom: 1920 × 1080 → screenshot or record
+    ================================================
+  -->
+
+  <div class="dash-canvas">
+
+    <!-- ─── HEADER ─── -->
+    <div class="dash-header">
+      <div>
+        <div class="dash-header__logo-row">
+          <div class="dash-header__logo-mark">AX</div>
+          <span class="dash-header__brand">Apex AI Systems &mdash; Lead Recovery System</span>
+        </div>
+        <div class="dash-header__title">Blue Ridge Roofing &amp; Restoration</div>
+        <div class="dash-header__sub">Chambersburg, PA &mdash; Revenue Recovery Report</div>
+      </div>
+      <div class="dash-header__right">
+        <div class="dash-header__period">&#x1F4C5;&nbsp; Last 30 Days</div>
+        <div class="dash-status">
+          <span class="dash-status__dot"></span>
+          Revenue Recovery Active &mdash; All Channels Running
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── HERO METRIC: $37,800 ─── -->
+    <div class="hero-metric">
+      <div class="hero-metric__left">
+        <div class="hero-metric__label">Recovered Revenue &mdash; Last 30 Days</div>
+        <div class="hero-metric__value">$37,800</div>
+        <div class="hero-metric__period">Revenue recovered before it became lost business</div>
+      </div>
+      <div class="hero-metric__right">
+        <div class="hero-metric__change">+$37,800</div>
+        <div class="hero-metric__change-sub">vs. $0 without Apex running</div>
+        <div class="hero-metric__divider"></div>
+        <div class="hero-metric__pills">
+          <div class="hero-pill">
+            <span>Missed Calls</span>
+            <span class="hero-pill__val">24</span>
+          </div>
+          <div class="hero-pill">
+            <span>After-Hours</span>
+            <span class="hero-pill__val">18</span>
+          </div>
+          <div class="hero-pill">
+            <span>Estimates</span>
+            <span class="hero-pill__val">9</span>
+          </div>
+          <div class="hero-pill">
+            <span>Dormant Leads</span>
+            <span class="hero-pill__val">6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── 7 SUPPORTING METRICS ─── -->
+    <div class="metrics-row">
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x1F4DE;</div>
+        <div class="metric-card__value metric-card__value--cyan">24</div>
+        <div class="metric-card__label">Missed Calls Recovered</div>
+        <div class="metric-card__trend">&#x2191; All captured</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x1F319;</div>
+        <div class="metric-card__value metric-card__value--cyan">18</div>
+        <div class="metric-card__label">After-Hours Leads Captured</div>
+        <div class="metric-card__trend">&#x2191; 0 to voicemail</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x26A0;&#xFE0F;</div>
+        <div class="metric-card__value metric-card__value--amber">7</div>
+        <div class="metric-card__label">Emergency Opportunities Routed</div>
+        <div class="metric-card__trend">Priority pipeline</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x1F4DD;</div>
+        <div class="metric-card__value metric-card__value--cyan">12</div>
+        <div class="metric-card__label">Web Forms Recovered</div>
+        <div class="metric-card__trend">Same-day response</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x1F4CB;</div>
+        <div class="metric-card__value metric-card__value--amber">9</div>
+        <div class="metric-card__label">Estimates Recovered</div>
+        <div class="metric-card__trend">Stale follow-ups closed</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x1F504;</div>
+        <div class="metric-card__value metric-card__value--green">6</div>
+        <div class="metric-card__label">Dormant Leads Reactivated</div>
+        <div class="metric-card__trend">45&plus; days inactive</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-card__icon">&#x2B50;</div>
+        <div class="metric-card__value metric-card__value--green">11</div>
+        <div class="metric-card__label">Reviews Generated</div>
+        <div class="metric-card__trend">Google &amp; direct</div>
+      </div>
+
+    </div>
+
+    <!-- ─── BOTTOM ROW: CHANNEL BREAKDOWN + OPPORTUNITIES ─── -->
+    <div class="bottom-row">
+
+      <!-- Channel breakdown -->
+      <div class="channel-card">
+        <div class="channel-card__title">Where Revenue Was Recovered</div>
+
+        <div class="ch-bar">
+          <div class="ch-bar__header">
+            <span class="ch-bar__name">Missed Calls</span>
+            <span class="ch-bar__value">38% &mdash; $14,364</span>
+          </div>
+          <div class="ch-bar__track"><div class="ch-bar__fill ch-bar__fill--cyan" style="width:38%"></div></div>
+        </div>
+
+        <div class="ch-bar">
+          <div class="ch-bar__header">
+            <span class="ch-bar__name">After-Hours Calls</span>
+            <span class="ch-bar__value">28% &mdash; $10,584</span>
+          </div>
+          <div class="ch-bar__track"><div class="ch-bar__fill ch-bar__fill--green" style="width:28%"></div></div>
+        </div>
+
+        <div class="ch-bar">
+          <div class="ch-bar__header">
+            <span class="ch-bar__name">Web Forms &amp; Inquiries</span>
+            <span class="ch-bar__value">19% &mdash; $7,182</span>
+          </div>
+          <div class="ch-bar__track"><div class="ch-bar__fill ch-bar__fill--amber" style="width:19%"></div></div>
+        </div>
+
+        <div class="ch-bar">
+          <div class="ch-bar__header">
+            <span class="ch-bar__name">Estimates &amp; Dormant</span>
+            <span class="ch-bar__value">15% &mdash; $5,670</span>
+          </div>
+          <div class="ch-bar__track"><div class="ch-bar__fill ch-bar__fill--blue" style="width:15%"></div></div>
+        </div>
+      </div>
+
+      <!-- Recent Recovered Opportunities table -->
+      <div class="opp-card">
+        <div class="opp-card__header">
+          <span class="opp-card__title">Recently Recovered Jobs</span>
+          <span class="opp-card__count">Showing 5 most recent</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Homeowner</th>
+              <th>Recovered From</th>
+              <th>Roofing Need</th>
+              <th>Status</th>
+              <th>Est. Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">John M.<br><span style="font-size:11px;color:var(--text-muted);font-weight:400;">Mechanicsburg, PA</span></td>
+              <td><span class="td-source">Missed Call &mdash; 9:47 PM</span></td>
+              <td>Wind damage &mdash; storm inspection</td>
+              <td><span class="badge badge--cyan">Inspection Scheduled</span></td>
+              <td class="td-value">$14,200</td>
+            </tr>
+            <tr>
+              <td class="td-name">Sarah T.<br><span style="font-size:11px;color:var(--text-muted);font-weight:400;">Hagerstown, MD</span></td>
+              <td><span class="td-source">Web Form &mdash; Saturday</span></td>
+              <td>Storm damage inspection</td>
+              <td><span class="badge badge--amber">Inspection Completed</span></td>
+              <td class="td-value">$9,850</td>
+            </tr>
+            <tr>
+              <td class="td-name">Robert W.<br><span style="font-size:11px;color:var(--text-muted);font-weight:400;">Chambersburg, PA</span></td>
+              <td><span class="td-source">After-Hours &mdash; 8:05 PM</span></td>
+              <td>Emergency leak &mdash; partial replacement</td>
+              <td><span class="badge badge--green">Won</span></td>
+              <td class="td-value">$8,600</td>
+            </tr>
+            <tr>
+              <td class="td-name">Lisa B.<br><span style="font-size:11px;color:var(--text-muted);font-weight:400;">Martinsburg, WV</span></td>
+              <td><span class="td-source">Dormant Lead &mdash; 47 days</span></td>
+              <td>Insurance full replacement</td>
+              <td><span class="badge badge--green">Won</span></td>
+              <td class="td-value">$16,750</td>
+            </tr>
+            <tr>
+              <td class="td-name">William H.<br><span style="font-size:11px;color:var(--text-muted);font-weight:400;">Hagerstown, MD</span></td>
+              <td><span class="td-source">Missed Call &mdash; 8:03 AM</span></td>
+              <td>Insurance replacement</td>
+              <td><span class="badge badge--green">Won</span></td>
+              <td class="td-value">$7,200</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ─── FOOTER BANNER ─── -->
+    <div class="dash-footer-banner">
+      <strong>Stop losing roofing jobs you already paid to generate.</strong>
+      &ensp;&mdash;&ensp; Apex AI Systems &ensp;|&ensp; Blue Ridge Roofing &amp; Restoration
+    </div>
+
+  </div><!-- end .dash-canvas -->
+
+</body>
+</html>
