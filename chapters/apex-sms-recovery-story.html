@@ -510,6 +510,32 @@ body {
 .rr-status b { color:var(--text-2); font-weight:700; }
 .rr-result { margin-top:12px; padding-top:12px; border-top:1px solid rgba(34,197,94,0.18); font-size:13px; font-weight:800; letter-spacing:0.02em; color:var(--green-hi); }
 .rr-result span { color:var(--text-muted); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; font-size:10px; margin-right:8px; }
+
+@media (max-width: 768px) {
+  /* Intro screen */
+  .incoming-sms-card { width: min(440px, calc(100% - 32px)); padding: 36px 20px 30px; }
+  /* Global header */
+  .global-header { padding: 12px 16px; }
+  .apex-brand-text { display: none; }
+  .client-pill { font-size: 10px; padding: 4px 10px; }
+  /* SMS demo screen — hide intel panel */
+  .intel-panel { display: none; }
+  .sms-conv-header { padding: 10px 16px; }
+  .sms-timer-display { font-size: 20px; }
+  .sms-meta-info { display: none; }
+  /* Summary */
+  .summary-headline { font-size: clamp(24px, 6vw, 50px); }
+  .summary-inner { padding: 20px 16px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 12px; }
+  /* Recovery compare */
+  .recovery-compare { flex-direction: column; }
+  /* CTA */
+  .cta-card { padding: 24px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .cta-headline { font-size: clamp(20px, 5vw, 38px); }
+  .cta-metrics { gap: 20px; flex-wrap: wrap; justify-content: flex-start; }
+  .cta-metric-val { font-size: clamp(22px, 5vw, 40px); }
+}
 </style>
 </head>
 <body>

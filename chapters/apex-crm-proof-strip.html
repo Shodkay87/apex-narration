@@ -148,6 +148,14 @@ html, body {
   font-size: 11px; font-weight: 700; color: var(--green-hi); white-space: nowrap;
 }
 .timing-dot { width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green); }
+
+@media (max-width: 640px) {
+  .strip { padding: 32px 20px 40px; }
+  .strip-header { flex-direction: column; gap: 14px; }
+  .strip-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .timing-pill { align-self: flex-start; }
+  .strip-title { font-size: 22px; }
+}
 </style>
 </head>
 <body>
