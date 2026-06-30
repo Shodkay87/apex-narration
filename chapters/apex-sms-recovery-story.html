@@ -1308,21 +1308,31 @@ function restart() {
   function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
 
   (function(){ var st=document.createElement('style');
-    st.textContent='#s-summary .rr-card,#s-summary .stats-row,#s-summary .contact-card,#s-summary .pipeline-wrap,#s-summary .recovery-divider,#s-summary .recovery-card,#s-summary .cta-card{animation:none;}'+
-      '.apex-cpan-pre{opacity:0;transform:translateY(44px);transition:none;}'+
-      '.apex-cpan-in{opacity:1;transform:translateY(0);transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1);}';
+    st.textContent='.apex-rv{opacity:0 !important;transform:translateY(48px) !important;animation:none !important;transition:none !important;will-change:opacity,transform;}'+
+      '.apex-rv.apex-rv-in{opacity:1 !important;transform:translateY(0) !important;transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1) !important;}';
     document.head.appendChild(st); })();
 
   var REVEAL_GROUPS = ['#s-summary .rr-card','#s-summary .stats-row','#s-summary .contact-card','#s-summary .pipeline-wrap','#s-summary .recovery-divider','#s-summary .recovery-card','#s-summary .cta-card'];
   var REVEAL_SEL = REVEAL_GROUPS.join(',');
+  var _rvTimers=[];
+  function _rvClear(){ for(var i=0;i<_rvTimers.length;i++) clearTimeout(_rvTimers[i]); _rvTimers=[]; }
+  function preHideResult(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.add('apex-rv'); el.classList.remove('apex-rv-in'); }); }
   function revealCards(){
-    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    setTimeout(function(){
-      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('apex-cpan-pre'); el.classList.add('apex-cpan-in'); }); }); }); }, g*480); });
-    }, 800);
+    _rvClear();
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-rv','apex-rv-in'); });
+      showContinue(); return;
+    }
+    var START=550, STEP=560, last=0;
+    REVEAL_GROUPS.forEach(function(sel,g){ last=g;
+      _rvTimers.push(setTimeout(function(){
+        document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add('apex-rv-in'); }); }); });
+      }, START + g*STEP));
+    });
+    _rvTimers.push(setTimeout(showContinue, START + (last+1)*STEP));
   }
-  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-pre','apex-cpan-in'); }); }
-  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); revealCards(); }
+  function clearReveal(){ _rvClear(); document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-rv','apex-rv-in'); }); }
+  function onComplete(){ playSeg(CFG.resultSrc); revealCards(); }
   function onReset(){ hideContinue(); stopNar(); clearReveal(); }
 
   var origStart = window[CFG.startFn];
@@ -1341,7 +1351,7 @@ function restart() {
   if(typeof origShow==="function"){
     window.showScreen = function(id){
       if(id===CFG.summaryId){
-        document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-in'); el.classList.add('apex-cpan-pre'); });
+        preHideResult();
       }
       var r = origShow.apply(this, arguments);
       if(id===CFG.summaryId) onComplete();

@@ -1409,6 +1409,7 @@ body {
 
 <!-- ═══════════ AUDIO ═══════════ -->
 <audio id="audio" preload="auto" crossorigin="anonymous" style="display:none">
+  <source src="./assets/hero-call/audio/ava-hero-call-stereo.mp3" type="audio/mpeg">
   <source src="./assets/hero-call/audio/ava-hero-call-stereo.wav" type="audio/wav">
   <source src="https://storage.vapi.ai/019f13c1-7620-7000-9d61-1b6990773452-1782742991251-6081bbaa-8ee1-4e52-99e6-f83d31c6a03b-stereo.wav" type="audio/wav">
 </audio>
@@ -2286,27 +2287,39 @@ audioEl.addEventListener('error', () => { audioMode = false; });
   // Inject CSS: kill rr-in on summary elements (ID+class beats class-only specificity)
   // and define camera-pan reveal classes used below
   (function(){ var st=document.createElement('style');
-    st.textContent='#s-summary .rr-card,#s-summary .stats-row,#s-summary .milestones-row,#s-summary .ai-card,#s-summary .recovery-divider,#s-summary .recovery-card,#s-summary .cta-card{animation:none;}'+
-      '.apex-cpan-pre{opacity:0;transform:translateY(44px);transition:none;}'+
-      '.apex-cpan-in{opacity:1;transform:translateY(0);transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1);}';
+    st.textContent='.apex-rv{opacity:0 !important;transform:translateY(48px) !important;animation:none !important;transition:none !important;will-change:opacity,transform;}'+
+      '.apex-rv.apex-rv-in{opacity:1 !important;transform:translateY(0) !important;transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1) !important;}';
     document.head.appendChild(st); })();
 
   var REVEAL_GROUPS = ['#s-summary .rr-card','#s-summary .stats-row','#s-summary .milestones-row','#s-summary .ai-card','#s-summary .recovery-divider','#s-summary .recovery-card','#s-summary .cta-card'];
   var REVEAL_SEL = REVEAL_GROUPS.join(',');
+  var _rvTimers=[];
+  function _rvClear(){ for(var i=0;i<_rvTimers.length;i++) clearTimeout(_rvTimers[i]); _rvTimers=[]; }
+  function preHideResult(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.add('apex-rv'); el.classList.remove('apex-rv-in'); }); }
   function revealCards(){
-    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    setTimeout(function(){
-      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('apex-cpan-pre'); el.classList.add('apex-cpan-in'); }); }); }); }, g*480); });
-    }, 800);
+    _rvClear();
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-rv','apex-rv-in'); });
+      showContinue(); return;
+    }
+    var START=550, STEP=560, last=0;
+    REVEAL_GROUPS.forEach(function(sel,g){ last=g;
+      _rvTimers.push(setTimeout(function(){
+        document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add('apex-rv-in'); }); }); });
+      }, START + g*STEP));
+    });
+    _rvTimers.push(setTimeout(showContinue, START + (last+1)*STEP));
   }
-  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-pre','apex-cpan-in'); }); }
-  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); revealCards(); }
+  function clearReveal(){ _rvClear(); document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-rv','apex-rv-in'); }); }
+  function onComplete(){ playSeg(CFG.resultSrc); revealCards(); }
   function onReset(){ hideContinue(); stopNar(); clearReveal(); }
 
   // Wrap the existing demo start: Jon intro narration → original demo.
   var origStart = window[CFG.startFn];
   function wrappedStart(){
     onReset();
+    /* Mobile: prime the Ava call <audio> inside THIS user gesture so its later (post-Jon-intro) play() isn't blocked by autoplay policy. */
+    try{ var _ava=document.getElementById('audio'); if(_ava && _ava.getAttribute('data-apex-unlocked')!=='1'){ _ava.muted=true; var _pp=_ava.play(); if(_pp&&_pp.then){ _pp.then(function(){ _ava.pause(); _ava.currentTime=0; _ava.muted=false; _ava.setAttribute('data-apex-unlocked','1'); }).catch(function(){ _ava.muted=false; }); } else { try{_ava.pause();}catch(e){} _ava.muted=false; _ava.setAttribute('data-apex-unlocked','1'); } } }catch(e){}
     if(CFG.startBtnSel){ var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display="none"; }
     playSeg(CFG.introSrc).then(function(){ if(typeof origStart==="function") origStart(); });
   }
@@ -2321,7 +2334,7 @@ audioEl.addEventListener('error', () => { audioMode = false; });
   if(typeof origShow==="function"){
     window.showScreen = function(id){
       if(id===CFG.summaryId){
-        document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-in'); el.classList.add('apex-cpan-pre'); });
+        preHideResult();
       }
       var r = origShow.apply(this, arguments);
       if(id===CFG.summaryId) onComplete();
