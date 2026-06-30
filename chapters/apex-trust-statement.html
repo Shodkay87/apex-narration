@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex AI — Trust Statement</title>
+  <style>
+    /* ============================================
+       DESIGN TOKENS — Apex Revenue Recovery (master-page parity)
+       ============================================ */
+    :root {
+      --bg-primary:    #080b12;
+      --bg-secondary:  #0e1320;
+      --bg-card:       #131a28;
+      --bg-card-alt:   #182030;
+      --bg-card-hover: #1c2840;
+
+      --accent-cyan:   #22d3ee;
+      --accent-blue:   #3b82f6;
+      --accent-glow:   rgba(34, 211, 238, 0.15);
+
+      --color-green:   #22c55e;
+      --color-green-bg: rgba(34, 197, 94, 0.1);
+      --color-amber:   #f59e0b;
+      --color-amber-bg: rgba(245, 158, 11, 0.1);
+      --color-red:     #ef4444;
+      --color-red-bg:  rgba(239, 68, 68, 0.1);
+
+      --text-primary:  #f1f5f9;
+      --text-secondary:#94a3b8;
+      --text-muted:    #64748b;
+
+      --border:        rgba(255,255,255,0.07);
+      --border-accent: rgba(34, 211, 238, 0.25);
+
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  20px;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+      --shadow-glow: 0 0 40px rgba(34,211,238,0.08);
+    }
+
+    /* ============================================
+       GLOBAL RESET & BASE
+       ============================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================
+       LAYOUT PRIMITIVES (master-page parity)
+       ============================================ */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      background: var(--accent-glow);
+      border: 1px solid var(--border-accent);
+      padding: 5px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    .section { padding: 100px 0; }
+    .section--alt { background: var(--bg-secondary); }
+    .section__header { margin-bottom: 56px; }
+    .section__header--center { text-align: center; }
+    .section__header--center .section-sub { margin: 0 auto; }
+
+    /* ============================================
+       ENTRANCE ANIMATION (self-contained, no deps)
+       ============================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ============================================
+       RESPONSIVE (master-page parity)
+       ============================================ */
+    @media (max-width: 720px) {
+      .container { padding: 0 16px; }
+      .section   { padding: 72px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       TRUST STATEMENT — opens the Apex Revenue Recovery Experience
+       Order: Business Problem → Trust Statement → fade into Revenue Leak #1
+       Self-contained embed — no external dependencies, no iframe.
+       ============================================ -->
+  <section class="section section--alt" id="trust">
+    <div class="container">
+      <div class="section__header section__header--center reveal" style="transition-delay:0.05s;">
+        <div class="section-label">The Apex Revenue Recovery Experience</div>
+        <h2 class="section-title">Every Day, Roofing Companies Lose Revenue<br>They Never Realize Existed</h2>
+        <p class="section-sub">Sometimes it&rsquo;s an emergency call after hours. Sometimes it&rsquo;s a missed call that never gets returned. Sometimes it&rsquo;s an estimate that quietly goes cold.</p>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.18s;max-width:760px;margin:32px auto 0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 36px;">
+        <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 16px;">The stories you&rsquo;re about to see are based on situations roofing companies face every day. To protect customer privacy, the names and contact information have been staged.</p>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-secondary);margin:0 0 22px;">But every workflow, every decision, and every business outcome represents how the Apex Revenue Recovery System is designed to operate.</p>
+        <p style="font-size:17px;line-height:1.6;font-weight:800;color:var(--text-primary);margin:0;letter-spacing:-0.01em;">Because trust isn&rsquo;t claimed&hellip; <span style="color:var(--accent-cyan)">it&rsquo;s demonstrated.</span></p>
+      </div>
+
+      <!-- Mini-film Start (idle until clicked — narration never autoplays) -->
+      <div class="reveal" id="mf-start-wrap" style="transition-delay:0.32s;text-align:center;margin-top:34px;">
+        <button type="button" id="mf-start-btn" class="apex-mf-start">&#9654; &nbsp;Start the Experience</button>
+        <div style="margin-top:14px;color:var(--text-muted);font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;">Narrated by Jon &middot; Apex AI</div>
+      </div>
+
+      <div class="reveal" id="mf-leak-hint" style="transition-delay:0.32s;text-align:center;margin-top:30px;color:var(--text-muted);font-size:12px;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;">&#8595; &nbsp;Revenue Leak #1 &nbsp;&middot;&nbsp; Emergency Calls</div>
+    </div>
+  </section>
+
+  <script>
+    /* Staggered scroll-in reveal — self-contained, gracefully degrades */
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       APEX MINI-FILM LAYER — chapter-triggered Jon narration + Continue
+       Voice: Jon — Warm & Grounded · ElevenLabs · ID MFZUKuGQUsGJPQjTS4wC
+       Stability 70 · Similarity 85 · Style 10 · Speed 0.95 · Speaker Boost ON
+       Narration files live in ./assets/narration/ (see NARRATION_MANIFEST.md).
+       Audio only plays on click — never on load or scroll.
+       ════════════════════════════════════════════════════════════════ -->
+  <style>
+    .apex-mf-start{display:inline-flex;align-items:center;cursor:pointer;font-family:inherit;font-size:16px;font-weight:800;color:#04081a;background:linear-gradient(135deg,#22d3ee,#3b82f6);border:none;border-radius:100px;padding:16px 34px;box-shadow:0 8px 30px rgba(34,211,238,.30);transition:transform .15s ease,box-shadow .15s ease;}
+    .apex-mf-start:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(34,211,238,.45);}
+    .apex-mf-start:active{transform:translateY(0);}
+    .apex-mf-continue-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:30px auto 6px;opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease;pointer-events:none;}
+    .apex-mf-continue-wrap.is-on{opacity:1;transform:none;pointer-events:auto;}
+    .apex-mf-continue{display:inline-flex;align-items:center;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:#04081a;background:linear-gradient(135deg,#22d3ee,#3b82f6);border:none;border-radius:100px;padding:15px 30px;box-shadow:0 8px 30px rgba(34,211,238,.30);transition:transform .15s ease,box-shadow .15s ease;}
+    .apex-mf-continue:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(34,211,238,.45);}
+    .apex-mf-pill{position:fixed;left:18px;bottom:18px;z-index:9999;display:none;align-items:center;gap:9px;background:rgba(8,11,18,.82);border:1px solid rgba(34,211,238,.28);border-radius:100px;padding:8px 15px 8px 13px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#cbd5e1;box-shadow:0 6px 24px rgba(0,0,0,.4);}
+    .apex-mf-pill.is-on{display:inline-flex;}
+    .apex-mf-eq{display:inline-flex;gap:2px;align-items:flex-end;height:13px;}
+    .apex-mf-eq i{width:3px;height:5px;background:#22d3ee;border-radius:2px;animation:apexEq .9s ease-in-out infinite;}
+    .apex-mf-eq i:nth-child(2){animation-delay:.15s}.apex-mf-eq i:nth-child(3){animation-delay:.3s}.apex-mf-eq i:nth-child(4){animation-delay:.45s}
+    @keyframes apexEq{0%,100%{height:4px}50%{height:13px}}
+  </style>
+  <script>
+  (function(){
+    "use strict";
+    var CFG = {
+      introSrc: "https://shodkay87.github.io/apex-narration/jon-00-opening.mp3",
+      continueLabel: "Continue to Revenue Leak #1 →",
+      continueTarget: "revenue-leak-1"
+    };
+
+    var audio = new Audio(); audio.preload = "auto";
+    var pill = document.createElement("div");
+    pill.className = "apex-mf-pill";
+    pill.innerHTML = '<span class="apex-mf-eq"><i></i><i></i><i></i><i></i></span><span>Jon is narrating</span>';
+    function pillOn(on){ if(!pill.parentNode) document.body.appendChild(pill); pill.classList.toggle("is-on", !!on); }
+
+    function playSeg(src){
+      return new Promise(function(resolve){
+        if(!src){ resolve(); return; }
+        var done=false;
+        function fin(){ if(done) return; done=true; audio.removeEventListener("ended",fin); audio.removeEventListener("error",fin); pillOn(false); resolve(); }
+        audio.addEventListener("ended",fin); audio.addEventListener("error",fin);
+        try{ audio.src=src; audio.currentTime=0; pillOn(true); var p=audio.play(); if(p&&p.catch) p.catch(function(){ fin(); }); }
+        catch(e){ fin(); }
+      });
+    }
+    function stopNar(){ try{ audio.pause(); audio.removeAttribute("src"); audio.load(); }catch(e){} pillOn(false); }
+
+    function apexContinue(target){
+      stopNar();
+      try{ if(window.parent && window.parent!==window){ window.parent.postMessage({type:"apex-chapter-continue", target:target}, "*"); } }catch(e){}
+      /* Fallback: jump the parent page to its #target section anchor (Framer "Scroll Section" name). */
+      try{ if(window.top && window.top!==window){ window.top.location.hash = target; } }catch(e){
+        try{ if(window.parent && window.parent!==window){ window.parent.location.hash = target; } }catch(e2){}
+      }
+      var local = document.getElementById(target) || document.querySelector('[data-apex-section="'+target+'"]');
+      if(local && local.scrollIntoView){ local.scrollIntoView({behavior:"smooth", block:"start"}); }
+    }
+
+    var continueWrap = null;
+    function showContinue(){
+      if(!continueWrap){
+        continueWrap = document.createElement("div");
+        continueWrap.className = "apex-mf-continue-wrap";
+        var btn = document.createElement("button");
+        btn.type="button"; btn.className="apex-mf-continue"; btn.innerHTML=CFG.continueLabel;
+        btn.addEventListener("click", function(){ apexContinue(CFG.continueTarget); });
+        continueWrap.appendChild(btn);
+        var hint = document.getElementById("mf-leak-hint");
+        hint.parentNode.insertBefore(continueWrap, hint);
+      }
+      requestAnimationFrame(function(){ continueWrap.classList.add("is-on"); });
+    }
+
+    var startBtn = document.getElementById("mf-start-btn");
+    var started = false;
+    startBtn.addEventListener("click", function(){
+      if(started) return; started = true;
+      var wrap = document.getElementById("mf-start-wrap");
+      if(wrap) wrap.style.display = "none";
+      playSeg(CFG.introSrc).then(showContinue);
+    });
+  })();
+  </script>
+
+</body>
+</html>

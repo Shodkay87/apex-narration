@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apex AI — Estimate Recovery Demo | Blue Ridge Roofing</title>
+<style>
+/* ─── RESET & ROOT ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #04081a; --card: rgba(255,255,255,0.032); --border: rgba(255,255,255,0.07);
+  --border-mid: rgba(255,255,255,0.11); --border-hi: rgba(255,255,255,0.18);
+  --blue: #3b82f6; --blue-hi: #60a5fa; --blue-dim: rgba(59,130,246,0.16);
+  --red: #ef4444; --red-hi: #fca5a5; --red-dim: rgba(239,68,68,0.13);
+  --green: #22c55e; --green-hi: #86efac; --green-dim: rgba(34,197,94,0.13);
+  --amber: #f59e0b; --amber-hi: #fcd34d; --amber-dim: rgba(245,158,11,0.13);
+  --purple: #8b5cf6; --purple-hi: #c4b5fd; --purple-dim: rgba(139,92,246,0.13);
+  --text: #f1f5f9; --text-2: #cbd5e1; --text-muted: #64748b; --text-dim: #2d3f5a;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+/* ─── HEADER ────────────────────────────────────────────────────── */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(4,8,26,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+  width: 28px; height: 28px;
+  background: var(--blue);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; color: #fff; letter-spacing: -0.5px;
+}
+.header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.header-sep { color: var(--text-dim); margin: 0 4px; }
+.header-sub { font-size: 12px; color: var(--text-muted); }
+.header-right { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+/* ─── MAIN STAGE ────────────────────────────────────────────────── */
+#stage {
+  position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ─── SCREENS ───────────────────────────────────────────────────── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   SCREEN 1 — INTRO
+───────────────────────────────────────────────────────────────── */
+#screen-intro {
+  flex-direction: column;
+  padding: 24px;
+}
+
+.intro-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card);
+  border: 1px solid var(--border-mid);
+  border-radius: 20px;
+  padding: 36px 40px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.intro-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--amber), var(--amber-hi), transparent);
+  opacity: 0.8;
+}
+
+.intro-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--text-muted); text-transform: uppercase; margin-bottom: 20px;
+}
+
+.estimate-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amber-dim);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 40px;
+  padding: 8px 16px;
+  margin-bottom: 20px;
+}
+.estimate-badge-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--amber);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+.estimate-badge-text {
+  font-size: 14px; font-weight: 700; color: var(--amber-hi);
+}
+
+.customer-name {
+  font-size: 34px; font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+.customer-sub {
+  font-size: 14px; color: var(--text-muted);
+  margin-bottom: 28px;
+}
+.customer-sub span {
+  color: var(--red-hi);
+  font-weight: 600;
+}
+
+.cold-strip {
+  background: var(--red-dim);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px; color: var(--red-hi);
+  margin-bottom: 28px;
+  display: flex; align-items: center; gap: 10px;
+}
+.cold-icon { font-size: 16px; }
+
+.ava-banner {
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.08));
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 32px;
+}
+.ava-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.ava-banner-text { font-size: 13px; line-height: 1.5; }
+.ava-banner-name { font-weight: 700; color: var(--blue-hi); }
+.ava-banner-desc { color: var(--text-muted); }
+
+.btn-start {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--blue), #2563eb);
+  color: #fff;
+  font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.35);
+}
+.btn-start:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 30px rgba(59,130,246,0.5);
+}
+.btn-start:active { transform: translateY(0); }
+
+/* ─────────────────────────────────────────────────────────────────
+   SCREEN 2 — DEMO
+───────────────────────────────────────────────────────────────── */
+#screen-demo {
+  flex-direction: column;
+  padding: 16px 20px;
+  gap: 0;
+}
+
+.demo-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.demo-title {
+  font-size: 16px; font-weight: 700; color: var(--text); flex: 1;
+}
+.demo-timer {
+  font-size: 13px; font-weight: 600; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+}
+.btn-ctrl {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-mid);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-ctrl:hover { background: rgba(255,255,255,0.07); border-color: var(--border-hi); }
+.btn-ctrl.stop:hover { border-color: rgba(239,68,68,0.4); color: var(--red-hi); }
+
+.demo-body {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  min-height: 0;
+}
+
+/* --- SMS PANEL --- */
+.sms-panel {
+  flex: 0 0 55%;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.sms-panel-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--text-muted); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.phone-frame {
+  flex: 1;
+  background: #0d1117;
+  border: 1px solid var(--border-mid);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.phone-topbar {
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.phone-contact-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.phone-contact-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.phone-contact-sub { font-size: 11px; color: var(--text-muted); }
+
+.sms-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+.sms-messages::-webkit-scrollbar { width: 4px; }
+.sms-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+.bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  animation: bubble-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.bubble-wrap.ava { align-items: flex-start; }
+.bubble-wrap.jennifer { align-items: flex-end; }
+
+@keyframes bubble-in {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.bubble-sender {
+  font-size: 10px; font-weight: 600; color: var(--text-muted);
+  margin-bottom: 3px; padding: 0 4px;
+}
+
+.bubble {
+  max-width: 82%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px; line-height: 1.55;
+  color: var(--text);
+}
+.bubble.ava {
+  background: rgba(59,130,246,0.18);
+  border: 1px solid rgba(59,130,246,0.28);
+  border-bottom-left-radius: 4px;
+}
+.bubble.jennifer {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border-mid);
+  border-bottom-right-radius: 4px;
+}
+
+.typing-indicator {
+  display: none;
+  align-items: center; gap: 5px;
+  padding: 12px 16px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 16px; border-bottom-left-radius: 4px;
+  width: fit-content;
+  margin-left: 0;
+}
+.typing-indicator.visible { display: flex; }
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue-hi); opacity: 0.6;
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-bounce {
+  0%,60%,100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+/* --- INTEL PANEL --- */
+.intel-panel {
+  flex: 0 0 45%;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.intel-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--text-muted); text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.intel-cards {
+  flex: 1;
+  display: flex; flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+.intel-cards::-webkit-scrollbar { width: 4px; }
+.intel-cards::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+.intel-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid transparent;
+  animation: card-slide-in 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  display: flex; align-items: center; gap: 10px;
+}
+@keyframes card-slide-in {
+  from { opacity: 0; transform: translateX(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+.intel-card.blue  { border-left-color: var(--blue);   background: var(--blue-dim); }
+.intel-card.green { border-left-color: var(--green);  background: var(--green-dim); }
+.intel-card.amber { border-left-color: var(--amber);  background: var(--amber-dim); }
+.intel-card.purple{ border-left-color: var(--purple); background: var(--purple-dim); }
+
+.intel-icon { font-size: 16px; flex-shrink: 0; }
+.intel-card-content { flex: 1; }
+.intel-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.intel-card-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.intel-timestamp {
+  font-size: 10px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.intel-complete {
+  margin-top: auto;
+  padding-top: 12px;
+  display: none;
+}
+.intel-complete.visible { display: block; }
+
+.deal-recovered-pill {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--green-dim), rgba(139,92,246,0.08));
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 12px;
+  font-size: 14px; font-weight: 800;
+  color: var(--green-hi);
+  letter-spacing: 0.02em;
+  animation: card-slide-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   SCREEN 3 — SUMMARY
+───────────────────────────────────────────────────────────────── */
+#screen-summary {
+  flex-direction: column;
+  padding: 20px 24px;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0;
+}
+#screen-summary::-webkit-scrollbar { width: 4px; }
+#screen-summary::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+.summary-inner {
+  width: 100%; max-width: 860px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 20px;
+  padding-bottom: 16px;
+}
+
+.success-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 40px;
+  font-size: 13px; font-weight: 700; color: var(--green-hi);
+  letter-spacing: 0.04em;
+}
+
+.summary-headline {
+  font-size: 28px; font-weight: 800; line-height: 1.2;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.summary-sub {
+  font-size: 15px; color: var(--text-muted); line-height: 1.6;
+  max-width: 640px;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border-mid);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 24px; font-weight: 800; color: var(--text);
+  letter-spacing: -0.5px; line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* GHL record card */
+.ghl-card {
+  background: var(--card);
+  border: 1px solid var(--border-mid);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.ghl-card-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.ghl-logo {
+  width: 20px; height: 20px; border-radius: 4px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: #fff;
+}
+.ghl-header-title { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.ghl-card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.ghl-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px;
+}
+.ghl-key { color: var(--text-muted); }
+.ghl-val { font-weight: 600; color: var(--text); }
+.ghl-val.green { color: var(--green-hi); }
+.ghl-val.blue { color: var(--blue-hi); }
+.ghl-val.purple { color: var(--purple-hi); }
+
+/* Pipeline */
+.pipeline-row {
+  display: flex; align-items: center; gap: 0;
+  overflow: hidden;
+}
+.pipe-stage {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+.pipe-stage::after {
+  content: '›';
+  position: absolute; right: -2px; top: 50%; transform: translateY(-50%);
+  color: var(--text-dim); font-size: 18px; z-index: 1;
+}
+.pipe-stage:last-child::after { display: none; }
+.pipe-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; margin-bottom: 6px;
+  border: 2px solid var(--border-mid);
+  background: var(--card);
+  color: var(--text-muted);
+}
+.pipe-dot.active {
+  background: var(--green-dim);
+  border-color: rgba(34,197,94,0.4);
+  color: var(--green-hi);
+}
+.pipe-dot.won {
+  background: var(--purple-dim);
+  border-color: rgba(139,92,246,0.4);
+  color: var(--purple-hi);
+}
+.pipe-name { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; line-height: 1.3; }
+
+/* Revenue comparison */
+.recovery-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.recovery-card {
+  border-radius: 14px;
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.recovery-card.without {
+  background: var(--red-dim);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.recovery-card.with {
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,0.2);
+}
+.recovery-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.recovery-card.without .recovery-label { color: var(--red-hi); }
+.recovery-card.with .recovery-label { color: var(--green-hi); }
+.recovery-amount {
+  font-size: 36px; font-weight: 900; letter-spacing: -1px; line-height: 1;
+}
+.recovery-card.without .recovery-amount { color: var(--red-hi); }
+.recovery-card.with .recovery-amount { color: var(--green-hi); }
+.recovery-desc { font-size: 13px; color: var(--text-muted); }
+
+/* Recovery bar */
+.recovery-bar-wrap { margin-top: 4px; }
+.recovery-bar-label {
+  font-size: 12px; color: var(--text-muted); margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+.recovery-bar-track {
+  height: 8px; background: rgba(255,255,255,0.06);
+  border-radius: 4px; overflow: hidden;
+}
+.recovery-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  border-radius: 4px;
+  width: 0%;
+  transition: width 1.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Tagline */
+.tagline {
+  text-align: center;
+  font-size: 17px; font-weight: 700; color: var(--text-2);
+  font-style: italic;
+  padding: 4px 0;
+}
+
+/* CTA card */
+.cta-card {
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.06));
+  border: 1px solid rgba(59,130,246,0.22);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.cta-headline { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.cta-sub { font-size: 13px; color: var(--text-muted); }
+.btn-demo {
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: var(--blue);
+  border: none;
+  color: #fff;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.15s, transform 0.15s;
+}
+.btn-demo:hover { background: var(--blue-hi); transform: translateY(-1px); }
+
+/* Replay button */
+#btn-replay {
+  margin-top: 4px;
+  display: none;
+  align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border-mid);
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  align-self: center;
+}
+#btn-replay.visible { display: flex; }
+#btn-replay:hover { border-color: var(--border-hi); color: var(--text); }
+
+/* Revenue counter */
+.revenue-counter {
+  font-size: 36px; font-weight: 900; color: var(--green-hi);
+  letter-spacing: -1px; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ STANDARDIZED REVENUE RECOVERED CARD (shared across all four experiences) ═══ */
+.rr-card {
+  background: linear-gradient(135deg, rgba(34,197,94,0.10), rgba(59,130,246,0.06));
+  border: 1px solid rgba(34,197,94,0.28); border-radius: 18px;
+  padding: 22px 26px; position: relative; overflow: hidden;
+  animation: rr-in 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+.rr-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, var(--green), var(--blue-hi), transparent); opacity:0.7; }
+@keyframes rr-in { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform: translateY(0); } }
+.rr-flow { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:15px; }
+.rr-step { font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; padding:5px 12px; border-radius:20px; }
+.rr-step.leak { color:var(--red-hi); background:rgba(239,68,68,0.10); border:1px solid rgba(239,68,68,0.22); }
+.rr-step.recovery { color:var(--blue-hi); background:rgba(59,130,246,0.10); border:1px solid rgba(59,130,246,0.22); }
+.rr-step.recovered { color:var(--green-hi); background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.32); }
+.rr-arrow { color:var(--text-dim); font-size:13px; }
+.rr-badge { display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--green-hi); margin-bottom:8px; }
+.rr-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+.rr-headline { font-size:21px; font-weight:900; letter-spacing:-0.02em; color:var(--text); line-height:1.25; margin-bottom:9px; }
+.rr-status { font-size:12px; color:var(--text-muted); font-weight:600; }
+.rr-status b { color:var(--text-2); font-weight:700; }
+.rr-result { margin-top:12px; padding-top:12px; border-top:1px solid rgba(34,197,94,0.18); font-size:13px; font-weight:800; letter-spacing:0.02em; color:var(--green-hi); }
+.rr-result span { color:var(--text-muted); font-weight:700; letter-spacing:0.1em; text-transform:uppercase; font-size:10px; margin-right:8px; }
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────────── -->
+<header id="header">
+  <div class="header-left">
+    <div class="header-logo">A</div>
+    <span class="header-title">Apex AI Systems</span>
+    <span class="header-sep">/</span>
+    <span class="header-sub">Revenue Recovery Platform</span>
+    <span class="header-sep" style="margin-left:8px">|</span>
+    <span class="header-sub" style="margin-left:4px">Blue Ridge Roofing &amp; Restoration</span>
+  </div>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <span>Demo Mode</span>
+  </div>
+</header>
+
+<!-- ─── STAGE ──────────────────────────────────────────────────── -->
+<div id="stage">
+
+  <!-- ── SCREEN 1: INTRO ─────────────────────────────────────── -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-card">
+      <div class="intro-label">Estimate Recovery Demo</div>
+
+      <div class="estimate-badge">
+        <div class="estimate-badge-dot"></div>
+        <span class="estimate-badge-text">$6,400 Estimate — 4 Days Silent</span>
+      </div>
+
+      <div class="customer-name">Lisa Brown</div>
+      <div class="customer-sub">Sent Monday · No response · <span>Going cold</span></div>
+
+      <div class="cold-strip">
+        <span class="cold-icon">❄️</span>
+        <span>Without Apex, this estimate sits in "Sent" forever — and quietly becomes lost revenue.</span>
+      </div>
+
+      <div class="ava-banner">
+        <div class="ava-avatar">A</div>
+        <div class="ava-banner-text">
+          <div class="ava-banner-name">Ava</div>
+          <div class="ava-banner-desc">Multi-Touch Re-Engagement Sequence · Email → Task → SMS</div>
+        </div>
+      </div>
+
+      <button class="btn-start" id="btn-start">▶ &nbsp;Start Demo</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: DEMO ──────────────────────────────────────── -->
+  <div class="screen" id="screen-demo">
+    <div class="demo-header">
+      <div class="demo-title">Estimate Re-Engagement</div>
+      <div class="demo-timer" id="demo-timer">0:00</div>
+      <button class="btn-ctrl" id="btn-pause">⏸ Pause</button>
+      <button class="btn-ctrl stop" id="btn-stop">■ Stop</button>
+    </div>
+
+    <div class="demo-body">
+      <!-- SMS Column -->
+      <div class="sms-panel">
+        <div class="sms-panel-label">SMS Follow-Up · Touch 3 (Day 5)</div>
+        <div class="phone-frame">
+          <div class="phone-topbar">
+            <div class="phone-contact-dot">J</div>
+            <div>
+              <div class="phone-contact-name">Lisa Brown</div>
+              <div class="phone-contact-sub">Blue Ridge Roofing — Estimate #1042</div>
+            </div>
+          </div>
+          <div class="sms-messages" id="sms-messages">
+            <!-- bubbles injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Intel Column -->
+      <div class="intel-panel">
+        <div class="intel-label">Deal Intelligence</div>
+        <div class="intel-cards" id="intel-cards">
+          <!-- cards injected by JS -->
+        </div>
+        <div class="intel-complete" id="intel-complete">
+          <div class="deal-recovered-pill">✅ &nbsp;Revenue Recovered</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 3: SUMMARY ───────────────────────────────────── -->
+  <div class="screen" id="screen-summary">
+    <div class="summary-inner">
+
+      <div class="success-pill">✅ &nbsp;Revenue Recovered — Estimate Reactivated</div>
+
+      <div>
+        <div class="summary-headline">An Estimate Going Cold.<br>Ava Reopened the Conversation.</div>
+      </div>
+
+      <div class="summary-sub">
+        4 days of silence — then a 3-touch re-engagement sequence: an email on Day 2, an internal task for Daniel on Day 3, and an SMS follow-up on Day 5. The estimate is reactivated and the customer is re-engaged.
+      </div>
+
+      <!-- Standardized Revenue Recovered card -->
+      <div class="rr-card">
+        <div class="rr-flow">
+          <span class="rr-step leak">Revenue Leak</span>
+          <span class="rr-arrow">→</span>
+          <span class="rr-step recovery">Apex Revenue Recovery</span>
+          <span class="rr-arrow">→</span>
+          <span class="rr-step recovered">Revenue Recovered</span>
+        </div>
+        <div class="rr-badge"><span class="rr-dot"></span> Revenue Recovered</div>
+        <div class="rr-headline">Estimate opportunity reactivated.</div>
+        <div class="rr-status">Status: <b>Customer Re-engaged</b> &nbsp;·&nbsp; Pipeline: <b>Follow-Up</b></div>
+        <div class="rr-result"><span>Business Result</span>Customer Re-engaged</div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--amber-hi)">3-Touch</div>
+          <div class="stat-label">Recovery Sequence</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--blue-hi)">Day 5</div>
+          <div class="stat-label">Customer Re-engaged</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--purple-hi)">Email · SMS</div>
+          <div class="stat-label">Channels Used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color:var(--green-hi)">Reopened</div>
+          <div class="stat-label">Estimate Status</div>
+        </div>
+      </div>
+
+      <!-- GHL Contact Record -->
+      <div class="ghl-card">
+        <div class="ghl-card-header">
+          <div class="ghl-logo">G</div>
+          <span class="ghl-header-title">GoHighLevel — Contact Record Updated</span>
+        </div>
+        <div class="ghl-card-body">
+          <div class="ghl-row"><span class="ghl-key">Contact</span><span class="ghl-val">Lisa Brown</span></div>
+          <div class="ghl-row"><span class="ghl-key">Email</span><span class="ghl-val">lisa.brown@email.com</span></div>
+          <div class="ghl-row"><span class="ghl-key">Property Address</span><span class="ghl-val">56 Maple Street, Greencastle, PA 17225</span></div>
+          <div class="ghl-row"><span class="ghl-key">Estimate</span><span class="ghl-val blue">$6,400 — Full Roof Replacement (est.)</span></div>
+          <div class="ghl-row"><span class="ghl-key">Recovery Touches</span><span class="ghl-val purple">Email (Day 2) → Task (Day 3) → SMS (Day 5)</span></div>
+          <div class="ghl-row"><span class="ghl-key">Status</span><span class="ghl-val green">Customer Re-engaged</span></div>
+          <div class="ghl-row"><span class="ghl-key">Pipeline Stage</span><span class="ghl-val">Follow-Up — booking in progress</span></div>
+        </div>
+      </div>
+
+      <!-- Pipeline -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px">Pipeline Stage</div>
+        <div class="pipeline-row">
+          <div class="pipe-stage">
+            <div class="pipe-dot active">✓</div>
+            <div class="pipe-name">New<br>Lead</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot">·</div>
+            <div class="pipe-name">Emergency</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot active">✓</div>
+            <div class="pipe-name">Inspection<br>Scheduled</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot active">✉</div>
+            <div class="pipe-name">Estimate<br>Sent</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot active">💬</div>
+            <div class="pipe-name">Follow-Up</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot">🏆</div>
+            <div class="pipe-name">Job<br>Won</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot">·</div>
+            <div class="pipe-name">Job<br>Completed</div>
+          </div>
+          <div class="pipe-stage">
+            <div class="pipe-dot">★</div>
+            <div class="pipe-name">Review<br>Requested</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue comparison -->
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px">Revenue Recovery</div>
+        <div class="recovery-grid">
+          <div class="recovery-card without">
+            <div class="recovery-label">Without Ava</div>
+            <div class="recovery-amount">Lost</div>
+            <div class="recovery-desc">Estimate forgotten. Opportunity lost. No follow-up ever sent.</div>
+          </div>
+          <div class="recovery-card with">
+            <div class="recovery-label">With Ava</div>
+            <div class="revenue-counter" id="revenue-counter">$0</div>
+            <div class="recovery-desc">$6,400 estimate (est.) reactivated. Customer re-engaged. Opportunity protected — booking in progress.</div>
+          </div>
+        </div>
+        <div class="recovery-bar-wrap" style="margin-top:14px">
+          <div class="recovery-bar-label">
+            <span>Estimate Re-engagement Rate</span>
+            <span style="color:var(--green-hi);font-weight:700">65%</span>
+          </div>
+          <div class="recovery-bar-track">
+            <div class="recovery-bar-fill" id="recovery-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tagline -->
+      <div class="tagline">"This wasn't just followed up. The opportunity was recovered."</div>
+
+      <!-- CTA -->
+      <div class="cta-card">
+        <div>
+          <div class="cta-headline">Stop Leaving Money in Your Sent Folder.</div>
+          <div class="cta-sub">Ava follows up on every estimate — automatically, personally, and 24/7.</div>
+        </div>
+        <a class="btn-demo" href="https://api.leadconnectorhq.com/widget/bookings/apex-ai-discovery-call" target="_blank" rel="noopener">Book a Demo</a>
+      </div>
+
+      <!-- Replay -->
+      <button id="btn-replay" class="visible">↺ &nbsp;Replay Demo</button>
+
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- ─────────────────────────────────────────────────────────────
+     JAVASCRIPT — SIMULATION / DEMO MODE
+     All timings are local; no external APIs are called.
+     This is a sales demo only — no real SMS messages are sent.
+──────────────────────────────────────────────────────────────── -->
+<script>
+// ── TIMING CONSTANTS ────────────────────────────────────────────
+const INTRO_HOLD     = 3500;   // ms: wait after start click before transitioning (unused; direct)
+const DEMO_END       = 28.0;   // seconds: when demo timeline finishes
+const SUMMARY_DELAY  = 1200;   // ms: delay after demo ends before showing summary
+const TYPING_PRE     = 0.85;   // seconds: show typing indicator before bubble appears
+
+// ── DEMO SCRIPT ─────────────────────────────────────────────────
+// Each event fires at `t` seconds from demo start.
+// type: 'ava' | 'jennifer' (SMS bubbles) | 'intel' (right panel card) | 'complete'
+const EVENTS = [
+  // t=1s — Ava sends opening message
+  {
+    t: 1.0 - TYPING_PRE,
+    type: 'typing', who: 'ava',
+  },
+  {
+    t: 1.0,
+    type: 'ava',
+    text: "Hi Lisa! This is Ava from Blue Ridge Roofing, following up on the roof replacement estimate Daniel sent. I also emailed it earlier this week — any questions I can help answer?",
+  },
+  // Touch 1 — Email follow-up (Day 2)
+  {
+    t: 0.3,
+    type: 'intel',
+    color: 'purple',
+    icon: '📧',
+    title: 'Touch 1 — Email Follow-Up',
+    sub: 'Day 2 · Estimate re-sent to lisa.brown@email.com',
+    ts: 'Day 2',
+  },
+  // Touch 2 — Internal CRM task (Day 3)
+  {
+    t: 0.6,
+    type: 'intel',
+    color: 'amber',
+    icon: '✅',
+    title: 'Touch 2 — Internal Task Created',
+    sub: 'Day 3 · Reminder assigned to Daniel (Owner)',
+    ts: 'Day 3',
+  },
+  // Touch 3 — SMS follow-up (Day 5) — the live conversation
+  {
+    t: 1.0,
+    type: 'intel',
+    color: 'blue',
+    icon: '💬',
+    title: 'Touch 3 — SMS Follow-Up Sent',
+    sub: 'Day 5 · Automated text delivered',
+    ts: 'Day 5',
+  },
+  // t=6s — Lisa replies
+  {
+    t: 6.0 - TYPING_PRE,
+    type: 'typing', who: 'jennifer',
+  },
+  {
+    t: 6.0,
+    type: 'jennifer',
+    text: "Hi, yes actually. I wasn't sure about the warranty on the materials.",
+  },
+  // t=6s — Intel: Customer Responded
+  {
+    t: 6.0,
+    type: 'intel',
+    color: 'green',
+    icon: '💬',
+    title: 'Customer Responded',
+    sub: 'Lisa Brown replied within 5 days',
+    ts: '0:06',
+  },
+  // t=7.5s — Ava answers warranty question
+  {
+    t: 7.5 - TYPING_PRE,
+    type: 'typing', who: 'ava',
+  },
+  {
+    t: 7.5,
+    type: 'ava',
+    text: "Great question! We use GAF Timberline HDZ shingles — they carry a 30-year manufacturer warranty and our labor warranty is 5 years written. Want me to send you the warranty details?",
+  },
+  // t=7.5s — Intel: Warranty Question Answered
+  {
+    t: 7.5,
+    type: 'intel',
+    color: 'blue',
+    icon: '🛡️',
+    title: 'Warranty Question Answered',
+    sub: 'GAF 30-yr + 5-yr labor warranty shared',
+    ts: '0:08',
+  },
+  // t=12s — Lisa asks for total
+  {
+    t: 12.0 - TYPING_PRE,
+    type: 'typing', who: 'jennifer',
+  },
+  {
+    t: 12.0,
+    type: 'jennifer',
+    text: "Yes please, and can you remind me of the total?",
+  },
+  // t=13s — Ava confirms estimate and asks for email
+  {
+    t: 13.0 - TYPING_PRE,
+    type: 'typing', who: 'ava',
+  },
+  {
+    t: 13.0,
+    type: 'ava',
+    text: "Of course! Your estimate is $6,400 which includes tear-off, new 30yr shingles, ice & water shield, and cleanup. I can email the full breakdown and warranty docs right now — what's your email?",
+  },
+  // t=13s — Intel: Estimate Confirmed
+  {
+    t: 13.0,
+    type: 'intel',
+    color: 'amber',
+    icon: '💰',
+    title: 'Estimate Confirmed: $6,400',
+    sub: 'Scope, pricing & materials reviewed',
+    ts: '0:13',
+  },
+  // t=18s — Lisa gives email
+  {
+    t: 18.0 - TYPING_PRE,
+    type: 'typing', who: 'jennifer',
+  },
+  {
+    t: 18.0,
+    type: 'jennifer',
+    text: "lisa.brown@email.com, and honestly that sounds reasonable",
+  },
+  // t=19.5s — Ava confirms email sent and offers scheduling
+  {
+    t: 19.5 - TYPING_PRE,
+    type: 'typing', who: 'ava',
+  },
+  {
+    t: 19.5,
+    type: 'ava',
+    text: "Sent! 📧 And great to hear. Would you like to go ahead and schedule the work? We have open slots the week of the 14th.",
+  },
+  // t=19.5s — Intel: Email Captured
+  {
+    t: 19.5,
+    type: 'intel',
+    color: 'green',
+    icon: '📧',
+    title: 'Email Captured',
+    sub: 'lisa.brown@email.com — warranty docs sent',
+    ts: '0:20',
+  },
+  // t=24s — Lisa confirms
+  {
+    t: 24.0 - TYPING_PRE,
+    type: 'typing', who: 'jennifer',
+  },
+  {
+    t: 24.0,
+    type: 'jennifer',
+    text: "Yes let's do it. The 14th works.",
+  },
+  // t=25.5s — Ava closes the deal
+  {
+    t: 25.5 - TYPING_PRE,
+    type: 'typing', who: 'ava',
+  },
+  {
+    t: 25.5,
+    type: 'ava',
+    text: "Perfect Lisa ✅ You're on the schedule for the week of the 14th. Daniel will confirm the exact day and time with you shortly. Looking forward to it!",
+  },
+  // t=25.5s — Intel: Job Scheduled
+  {
+    t: 25.5,
+    type: 'intel',
+    color: 'purple',
+    icon: '📅',
+    title: 'Job Scheduled — Week of 14th',
+    sub: 'Appointment confirmed with customer',
+    ts: '0:26',
+  },
+  // t=26s — Intel: CRM Updated — Won
+  {
+    t: 26.0,
+    type: 'intel',
+    color: 'purple',
+    icon: '🔄',
+    title: 'CRM Updated — Re-engaged',
+    sub: 'Pipeline stage → Follow-Up · booking in progress',
+    ts: '0:26',
+  },
+  // t=27s — Show "Deal Recovered" complete state
+  {
+    t: 27.0,
+    type: 'complete',
+  },
+];
+
+// ── STATE ────────────────────────────────────────────────────────
+let rafId        = null;   // requestAnimationFrame handle
+let startTime    = null;   // performance.now() when demo started (drift-corrected)
+let pausedAt     = null;   // performance.now() when paused
+let isPaused     = false;
+let isDemoRunning = false;
+let firedEvents  = new Set();
+let typingWho    = null;   // 'ava' | 'jennifer' | null
+
+// ── DOM REFS ─────────────────────────────────────────────────────
+const screenIntro   = document.getElementById('screen-intro');
+const screenDemo    = document.getElementById('screen-demo');
+const screenSummary = document.getElementById('screen-summary');
+const btnStart      = document.getElementById('btn-start');
+const btnPause      = document.getElementById('btn-pause');
+const btnStop       = document.getElementById('btn-stop');
+const btnReplay     = document.getElementById('btn-replay');
+const demoTimer     = document.getElementById('demo-timer');
+const smsMessages   = document.getElementById('sms-messages');
+const intelCards    = document.getElementById('intel-cards');
+const intelComplete = document.getElementById('intel-complete');
+const recoveryBar   = document.getElementById('recovery-bar');
+const revenueCounter= document.getElementById('revenue-counter');
+
+// Typing indicator node (reused)
+const typingNode = (function() {
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap ava';
+  wrap.style.display = 'none';
+  const ind = document.createElement('div');
+  ind.className = 'typing-indicator visible';
+  [1,2,3].forEach(() => {
+    const d = document.createElement('div');
+    d.className = 'typing-dot';
+    ind.appendChild(d);
+  });
+  wrap.appendChild(ind);
+  smsMessages.appendChild(wrap);
+  return wrap;
+})();
+
+// ── SCREEN TRANSITIONS ───────────────────────────────────────────
+function showScreen(id) {
+  [screenIntro, screenDemo, screenSummary].forEach(s => {
+    s.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+// ── FORMAT TIMER ────────────────────────────────────────────────
+function fmtTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ── DEMO TICK LOOP (requestAnimationFrame) ───────────────────────
+// SIMULATION: This loop drives a purely local timeline — no network calls.
+function tick(now) {
+  if (!isDemoRunning) return;
+  if (isPaused) { rafId = requestAnimationFrame(tick); return; }
+
+  const elapsed = (now - startTime) / 1000; // seconds
+
+  // Update timer display
+  demoTimer.textContent = fmtTime(elapsed);
+
+  // Fire events at their scheduled times
+  EVENTS.forEach((ev, idx) => {
+    if (firedEvents.has(idx)) return;
+    if (elapsed >= ev.t) {
+      firedEvents.add(idx);
+      fireEvent(ev);
+    }
+  });
+
+  // End condition
+  if (elapsed >= DEMO_END) {
+    isDemoRunning = false;
+    demoTimer.textContent = fmtTime(DEMO_END);
+    hideTyping();
+    setTimeout(transitionToSummary, SUMMARY_DELAY);
+    return;
+  }
+
+  rafId = requestAnimationFrame(tick);
+}
+
+// ── FIRE A SINGLE EVENT ──────────────────────────────────────────
+function fireEvent(ev) {
+  switch (ev.type) {
+    case 'typing':
+      showTyping(ev.who);
+      break;
+    case 'ava':
+      hideTyping();
+      appendBubble('ava', ev.text);
+      break;
+    case 'jennifer':
+      hideTyping();
+      appendBubble('jennifer', ev.text);
+      break;
+    case 'intel':
+      appendIntelCard(ev);
+      break;
+    case 'complete':
+      intelComplete.classList.add('visible');
+      break;
+  }
+}
+
+// ── SMS BUBBLE ───────────────────────────────────────────────────
+function appendBubble(who, text) {
+  const wrap = document.createElement('div');
+  wrap.className = `bubble-wrap ${who}`;
+
+  const sender = document.createElement('div');
+  sender.className = 'bubble-sender';
+  sender.textContent = who === 'ava' ? 'Ava · Blue Ridge Roofing' : 'Lisa Brown';
+  wrap.appendChild(sender);
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${who}`;
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+
+  // Insert before the typing node so typing stays at bottom
+  smsMessages.insertBefore(wrap, typingNode);
+  smsMessages.scrollTop = smsMessages.scrollHeight;
+}
+
+// ── TYPING INDICATOR ─────────────────────────────────────────────
+function showTyping(who) {
+  typingWho = who;
+  typingNode.style.display = 'flex';
+  typingNode.className = `bubble-wrap ${who}`;
+  smsMessages.scrollTop = smsMessages.scrollHeight;
+}
+
+function hideTyping() {
+  typingNode.style.display = 'none';
+  typingWho = null;
+}
+
+// ── INTEL CARD ───────────────────────────────────────────────────
+function appendIntelCard(ev) {
+  const card = document.createElement('div');
+  card.className = `intel-card ${ev.color}`;
+
+  const icon = document.createElement('div');
+  icon.className = 'intel-icon';
+  icon.textContent = ev.icon;
+
+  const content = document.createElement('div');
+  content.className = 'intel-card-content';
+  content.innerHTML = `<div class="intel-card-title">${ev.title}</div><div class="intel-card-sub">${ev.sub}</div>`;
+
+  const ts = document.createElement('div');
+  ts.className = 'intel-timestamp';
+  ts.textContent = ev.ts;
+
+  card.appendChild(icon);
+  card.appendChild(content);
+  card.appendChild(ts);
+  intelCards.appendChild(card);
+  intelCards.scrollTop = intelCards.scrollHeight;
+}
+
+// ── SUMMARY ENTRY ANIMATIONS ─────────────────────────────────────
+function transitionToSummary() {
+  showScreen('screen-summary');
+
+  // Animate revenue counter $0 → $6,400
+  const TARGET = 6400;
+  const DURATION = 2000; // ms
+  const start = performance.now();
+  function countUp(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / DURATION, 1);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = Math.round(eased * TARGET);
+    revenueCounter.textContent = '$' + val.toLocaleString();
+    if (progress < 1) requestAnimationFrame(countUp);
+  }
+  requestAnimationFrame(countUp);
+
+  // Animate recovery bar to 65%
+  setTimeout(() => {
+    recoveryBar.style.width = '65%';
+  }, 400);
+
+  // Show replay button
+  btnReplay.classList.add('visible');
+}
+
+// ── START DEMO ───────────────────────────────────────────────────
+function startDemo() {
+  // Reset state
+  isDemoRunning = true;
+  isPaused      = false;
+  firedEvents   = new Set();
+  pausedAt      = null;
+  typingWho     = null;
+
+  // Clear SMS messages (keep typing node)
+  Array.from(smsMessages.children).forEach(c => {
+    if (c !== typingNode) c.remove();
+  });
+  hideTyping();
+
+  // Clear intel cards
+  while (intelCards.firstChild) intelCards.removeChild(intelCards.firstChild);
+  intelComplete.classList.remove('visible');
+
+  // Reset timer and controls
+  demoTimer.textContent = '0:00';
+  btnPause.textContent  = '⏸ Pause';
+  btnReplay.classList.remove('visible');
+
+  // Reset summary animations
+  recoveryBar.style.width = '0%';
+  revenueCounter.textContent = '$0';
+
+  showScreen('screen-demo');
+
+  startTime = performance.now();
+  rafId = requestAnimationFrame(tick);
+}
+
+// ── PAUSE / RESUME ───────────────────────────────────────────────
+// Uses startTime drift-correction pattern:
+//   on pause:  pausedAt = performance.now()
+//   on resume: startTime += (performance.now() - pausedAt)
+function togglePause() {
+  if (!isDemoRunning) return;
+
+  if (!isPaused) {
+    // PAUSE
+    isPaused = true;
+    pausedAt = performance.now();
+    hideTyping();
+    btnPause.textContent = '▶ Resume';
+  } else {
+    // RESUME — correct startTime for the paused duration
+    const pausedDuration = performance.now() - pausedAt;
+    startTime += pausedDuration;
+    pausedAt   = null;
+    isPaused   = false;
+    btnPause.textContent = '⏸ Pause';
+    // Re-fire typing if we were mid-typing
+    // (handled naturally by next tick)
+    rafId = requestAnimationFrame(tick);
+  }
+}
+
+// ── STOP ─────────────────────────────────────────────────────────
+function stopDemo() {
+  isDemoRunning = false;
+  isPaused      = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  hideTyping();
+  showScreen('screen-intro');
+  btnPause.textContent = '⏸ Pause';
+  btnReplay.classList.remove('visible');
+}
+
+// ── REPLAY ───────────────────────────────────────────────────────
+function replayDemo() {
+  startDemo();
+}
+
+// ── EVENT LISTENERS ──────────────────────────────────────────────
+btnStart.addEventListener('click', startDemo);
+btnPause.addEventListener('click', togglePause);
+btnStop.addEventListener('click',  stopDemo);
+btnReplay.addEventListener('click', replayDemo);
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     APEX MINI-FILM LAYER — chapter-triggered Jon narration + Continue
+     Voice: Jon — Warm & Grounded · ElevenLabs · ID MFZUKuGQUsGJPQjTS4wC
+     Stability 70 · Similarity 85 · Style 10 · Speed 0.95 · Speaker Boost ON
+     Start ▸ Jon intro ▸ existing multi-touch follow-up demo ▸ Revenue
+     Recovered ▸ Jon result + Continue. Audio only on click; never on load/scroll.
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+  .apex-mf-continue-wrap{display:flex;justify-content:center;margin:30px auto 10px;opacity:0;transform:translateY(10px);transition:opacity .55s ease,transform .55s ease;pointer-events:none;}
+  .apex-mf-continue-wrap.is-on{opacity:1;transform:none;pointer-events:auto;}
+  .apex-mf-continue{display:inline-flex;align-items:center;cursor:pointer;font-family:inherit;font-size:15px;font-weight:800;color:#04081a;background:linear-gradient(135deg,#22d3ee,#3b82f6);border:none;border-radius:100px;padding:15px 30px;box-shadow:0 8px 30px rgba(34,211,238,.30);transition:transform .15s ease,box-shadow .15s ease;}
+  .apex-mf-continue:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(34,211,238,.45);}
+  .apex-mf-continue:active{transform:translateY(0);}
+  .apex-mf-pill{position:fixed;left:18px;bottom:18px;z-index:99999;display:none;align-items:center;gap:9px;background:rgba(8,11,18,.82);border:1px solid rgba(34,211,238,.28);border-radius:100px;padding:8px 15px 8px 13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#cbd5e1;box-shadow:0 6px 24px rgba(0,0,0,.4);}
+  .apex-mf-pill.is-on{display:inline-flex;}
+  .apex-mf-eq{display:inline-flex;gap:2px;align-items:flex-end;height:13px;}
+  .apex-mf-eq i{width:3px;height:5px;background:#22d3ee;border-radius:2px;animation:apexEq .9s ease-in-out infinite;}
+  .apex-mf-eq i:nth-child(2){animation-delay:.15s}.apex-mf-eq i:nth-child(3){animation-delay:.3s}.apex-mf-eq i:nth-child(4){animation-delay:.45s}
+  @keyframes apexEq{0%,100%{height:4px}50%{height:13px}}
+</style>
+<script>
+(function(){
+  "use strict";
+  var CFG = {
+    introSrc:  "https://shodkay87.github.io/apex-narration/jon-04-estimate-intro.mp3",
+    resultSrc: "https://shodkay87.github.io/apex-narration/jon-04-estimate-result.mp3",
+    startFn: "startDemo",
+    rebindStartSel: "#btn-start",
+    startBtnSel: "#btn-start",
+    summaryId: "screen-summary",
+    introScreenId: "screen-intro",
+    continueHostSel: ".summary-inner",
+    resetFns: [],
+    continueLabel: "Continue Behind the Scenes →",
+    continueTarget: "behind-the-scenes"
+  };
+
+  var audio = new Audio(); audio.preload = "auto";
+  var pill = document.createElement("div");
+  pill.className = "apex-mf-pill";
+  pill.innerHTML = '<span class="apex-mf-eq"><i></i><i></i><i></i><i></i></span><span>Jon is narrating</span>';
+  function pillOn(on){ if(!pill.parentNode) document.body.appendChild(pill); pill.classList.toggle("is-on", !!on); }
+
+  function playSeg(src){
+    return new Promise(function(resolve){
+      if(!src){ resolve(); return; }
+      var done=false;
+      function fin(){ if(done) return; done=true; audio.removeEventListener("ended",fin); audio.removeEventListener("error",fin); pillOn(false); resolve(); }
+      audio.addEventListener("ended",fin); audio.addEventListener("error",fin);
+      try{ audio.src=src; audio.currentTime=0; pillOn(true); var p=audio.play(); if(p&&p.catch) p.catch(function(){ fin(); }); }
+      catch(e){ fin(); }
+    });
+  }
+  function stopNar(){ try{ audio.pause(); audio.removeAttribute("src"); audio.load(); }catch(e){} pillOn(false); }
+
+  function apexContinue(target){
+    stopNar();
+    try{ if(window.parent && window.parent!==window){ window.parent.postMessage({type:"apex-chapter-continue", target:target}, "*"); } }catch(e){}
+    /* Fallback: jump the parent page to its #target section anchor (Framer "Scroll Section" name). */
+    try{ if(window.top && window.top!==window){ window.top.location.hash = target; } }catch(e){
+      try{ if(window.parent && window.parent!==window){ window.parent.location.hash = target; } }catch(e2){}
+    }
+    var local = document.getElementById(target) || document.querySelector('[data-apex-section="'+target+'"]');
+    if(local && local.scrollIntoView){ local.scrollIntoView({behavior:"smooth", block:"start"}); }
+  }
+
+  function ensureContinue(){
+    var wrap = document.getElementById("apex-mf-continue-wrap");
+    if(wrap) return wrap;
+    wrap = document.createElement("div");
+    wrap.className = "apex-mf-continue-wrap"; wrap.id = "apex-mf-continue-wrap";
+    var btn = document.createElement("button");
+    btn.type="button"; btn.className="apex-mf-continue"; btn.innerHTML=CFG.continueLabel;
+    btn.addEventListener("click", function(){ apexContinue(CFG.continueTarget); });
+    wrap.appendChild(btn);
+    var host = (CFG.continueHostSel && document.querySelector(CFG.continueHostSel)) || document.getElementById(CFG.summaryId) || document.body;
+    host.appendChild(wrap);
+    return wrap;
+  }
+  function showContinue(){ var w = ensureContinue(); requestAnimationFrame(function(){ w.classList.add("is-on"); }); }
+  function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
+
+  function setStartBtn(show){ if(!CFG.startBtnSel) return; var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display = show ? "" : "none"; }
+  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); }
+  function onReset(){ hideContinue(); stopNar(); setStartBtn(true); }
+
+  var origStart = window[CFG.startFn];
+  function wrappedStart(){
+    onReset();
+    setStartBtn(false);
+    playSeg(CFG.introSrc).then(function(){ if(typeof origStart==="function") origStart(); });
+  }
+  if(typeof origStart==="function"){ window[CFG.startFn] = wrappedStart; }
+  if(CFG.rebindStartSel){
+    var sb = document.querySelector(CFG.rebindStartSel);
+    if(sb){ if(typeof origStart==="function"){ try{ sb.removeEventListener("click", origStart); }catch(e){} } sb.addEventListener("click", function(){ window[CFG.startFn](); }); }
+  }
+
+  var origShow = window.showScreen;
+  if(typeof origShow==="function"){
+    window.showScreen = function(id){
+      var r = origShow.apply(this, arguments);
+      if(id===CFG.summaryId) onComplete();
+      else if(id===CFG.introScreenId) onReset();
+      return r;
+    };
+  }
+
+  (CFG.resetFns||[]).forEach(function(fn){
+    var o = window[fn];
+    if(typeof o==="function"){ window[fn] = function(){ onReset(); return o.apply(this, arguments); }; }
+  });
+})();
+</script>
+</body>
+</html>
