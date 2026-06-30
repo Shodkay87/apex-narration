@@ -2075,8 +2075,10 @@
   function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
 
   function setStartBtn(show){ if(!CFG.startBtnSel) return; var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display = show ? "" : "none"; }
-  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); }
-  function onReset(){ hideContinue(); stopNar(); setStartBtn(true); }
+  var _resultTimer = null;
+  var _resultStarted = false;
+  function onComplete(){ showContinue(); if(!_resultStarted) playSeg(CFG.resultSrc); }
+  function onReset(){ hideContinue(); stopNar(); setStartBtn(true); if(_resultTimer){clearTimeout(_resultTimer);_resultTimer=null;} _resultStarted=false; }
 
   var origStart = window[CFG.startFn];
   function wrappedStart(){
@@ -2097,6 +2099,12 @@
       var r = origShow.apply(this, arguments);
       // T3+Issue2: narration starts with form fill, guiding viewer through form into comparison
       if(id==='screen-form') playSeg(CFG.introSrc);
+      // Early result narration: fires 4s before demo ends (26s into 30s comparison)
+      // so Jon bridges into the summary rather than starting cold after it appears
+      else if(id==='screen-demo'){
+        if(_resultTimer) clearTimeout(_resultTimer);
+        _resultTimer = setTimeout(function(){ _resultStarted=true; playSeg(CFG.resultSrc); }, 26000);
+      }
       else if(id===CFG.summaryId) onComplete();
       else if(id===CFG.introScreenId) onReset();
       return r;

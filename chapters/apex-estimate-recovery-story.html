@@ -1484,16 +1484,21 @@ btnReplay.addEventListener('click', replayDemo);
   function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
 
   function setStartBtn(show){ if(!CFG.startBtnSel) return; var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display = show ? "" : "none"; }
+  (function(){ var st=document.createElement('style');
+    st.textContent='#screen-summary .rr-card,#screen-summary .stats-row,#screen-summary .ghl-card{animation:none;}'+
+      '.apex-cpan-pre{opacity:0;transform:translateY(-32px);transition:none;}'+
+      '.apex-cpan-in{opacity:1;transform:translateY(0);transition:opacity 0.75s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.75s cubic-bezier(0.25,0.46,0.45,0.94);}';
+    document.head.appendChild(st); })();
+
   var REVEAL_GROUPS = ['#screen-summary .rr-card','#screen-summary .stats-row','#screen-summary .ghl-card'];
   var REVEAL_SEL = REVEAL_GROUPS.join(',');
   function revealCards(){
     if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    REVEAL_GROUPS.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(el){ el.style.animation='none'; el.style.opacity='0'; el.style.transform='translateY(-20px)'; }); });
     setTimeout(function(){
-      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.style.transition='opacity 0.65s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94)'; el.style.opacity='1'; el.style.transform='translateY(0)'; }); }); }); }, g*300); });
+      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.remove('apex-cpan-pre'); el.classList.add('apex-cpan-in'); }); }); }); }, g*300); });
     }, 800);
   }
-  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.style.animation=''; el.style.opacity=''; el.style.transform=''; el.style.transition=''; }); }
+  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-pre','apex-cpan-in'); }); }
   function onComplete(){ showContinue(); playSeg(CFG.resultSrc); revealCards(); }
   function onReset(){ hideContinue(); stopNar(); setStartBtn(true); clearReveal(); }
 
@@ -1512,6 +1517,9 @@ btnReplay.addEventListener('click', replayDemo);
   var origShow = window.showScreen;
   if(typeof origShow==="function"){
     window.showScreen = function(id){
+      if(id===CFG.summaryId){
+        document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.classList.remove('apex-cpan-in'); el.classList.add('apex-cpan-pre'); });
+      }
       var r = origShow.apply(this, arguments);
       if(id===CFG.summaryId) onComplete();
       else if(id===CFG.introScreenId) onReset();
