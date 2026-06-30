@@ -2095,8 +2095,8 @@
   if(typeof origShow==="function"){
     window.showScreen = function(id){
       var r = origShow.apply(this, arguments);
-      // T3: play intro narration when comparison begins, not before experience starts
-      if(id==='screen-demo') playSeg(CFG.introSrc);
+      // T3+Issue2: narration starts with form fill, guiding viewer through form into comparison
+      if(id==='screen-form') playSeg(CFG.introSrc);
       else if(id===CFG.summaryId) onComplete();
       else if(id===CFG.introScreenId) onReset();
       return r;

@@ -1484,14 +1484,17 @@ btnReplay.addEventListener('click', replayDemo);
   function hideContinue(){ var w = document.getElementById("apex-mf-continue-wrap"); if(w) w.classList.remove("is-on"); }
 
   function setStartBtn(show){ if(!CFG.startBtnSel) return; var b=document.querySelectorAll(CFG.startBtnSel); for(var i=0;i<b.length;i++) b[i].style.display = show ? "" : "none"; }
-  var REVEAL_SEL = '#screen-summary .rr-card, #screen-summary .stats-row, #screen-summary .ghl-card';
+  var REVEAL_GROUPS = ['#screen-summary .rr-card','#screen-summary .stats-row','#screen-summary .ghl-card'];
+  var REVEAL_SEL = REVEAL_GROUPS.join(',');
   function revealCards(){
     if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var els=document.querySelectorAll(REVEAL_SEL);
-    els.forEach(function(el,i){ el.style.opacity='0'; el.style.transform='translateY(14px)'; el.style.transition='opacity 0.55s ease,transform 0.55s ease'; setTimeout(function(){ el.style.opacity=''; el.style.transform=''; }, 180+i*210); });
+    REVEAL_GROUPS.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(el){ el.style.animation='none'; el.style.opacity='0'; el.style.transform='translateY(-20px)'; }); });
+    setTimeout(function(){
+      REVEAL_GROUPS.forEach(function(sel,g){ setTimeout(function(){ document.querySelectorAll(sel).forEach(function(el){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.style.transition='opacity 0.65s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94)'; el.style.opacity='1'; el.style.transform='translateY(0)'; }); }); }); }, g*300); });
+    }, 800);
   }
-  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.style.opacity=''; el.style.transform=''; el.style.transition=''; }); }
-  function onComplete(){ revealCards(); showContinue(); playSeg(CFG.resultSrc); }
+  function clearReveal(){ document.querySelectorAll(REVEAL_SEL).forEach(function(el){ el.style.animation=''; el.style.opacity=''; el.style.transform=''; el.style.transition=''; }); }
+  function onComplete(){ showContinue(); playSeg(CFG.resultSrc); revealCards(); }
   function onReset(){ hideContinue(); stopNar(); setStartBtn(true); clearReveal(); }
 
   var origStart = window[CFG.startFn];
