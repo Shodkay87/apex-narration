@@ -51,8 +51,6 @@
       transition: opacity 0.5s ease;
     }
     .screen.active { opacity: 1; pointer-events: all; }
-    .screen.slide-down { transform: translateY(24px) scale(0.985); }
-    .screen.slide-up   { transform: translateY(-16px) scale(1.01); }
 
     /* ── Flash overlay ───────────────────────────────────────── */
     #flash {
@@ -63,1440 +61,1006 @@
     }
     #flash.on { opacity: 1; }
 
-    /* ── Global header ───────────────────────────────────────── */
-    .global-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 28px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(4,8,26,0.72);
-      backdrop-filter: blur(12px);
-      flex-shrink: 0; z-index: 10;
-    }
-    .apex-brand { display: flex; align-items: center; gap: 10px; }
-    .apex-mark {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: linear-gradient(140deg, #4f96ff, #2563eb);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 15px; color: #fff;
-    }
-    .apex-brand-text { font-size: 13px; font-weight: 700; color: var(--text); }
-    .apex-brand-sub  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-    .client-pill {
-      display: flex; align-items: center; gap: 7px;
-      padding: 5px 12px; border-radius: 20px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      font-size: 11px; color: var(--text-2);
-    }
-    .status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); animation: pulse-dot 2s infinite;
-    }
-
     /* ── Animations ──────────────────────────────────────────── */
     @keyframes pulse-dot {
       0%,100%{ opacity:1; transform:scale(1); }
       50%{ opacity:0.5; transform:scale(0.75); }
     }
-    @keyframes card-float {
-      0%,100%{ transform:translateY(0); }
-      50%{ transform:translateY(-7px); }
+    @keyframes widget-pulse {
+      0%{ box-shadow: 0 0 0 0 rgba(59,130,246,0.65); }
+      70%{ box-shadow: 0 0 0 12px rgba(59,130,246,0); }
+      100%{ box-shadow: 0 0 0 0 rgba(59,130,246,0); }
     }
-    @keyframes apexEq {
-      0%,100%{ height:4px; }
-      50%{ height:13px; }
+    @keyframes widget-bounce {
+      0%,100%{ transform:scale(1); }
+      40%{ transform:scale(1.10); }
+      60%{ transform:scale(0.96); }
+      80%{ transform:scale(1.03); }
+    }
+    @keyframes msg-in {
+      from{ opacity:0; transform:translateY(7px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    @keyframes typing-dot {
+      0%,80%,100%{ transform:translateY(0); opacity:0.4; }
+      40%{ transform:translateY(-4px); opacity:1; }
+    }
+    @keyframes step-in {
+      from{ opacity:0; transform:translateX(-12px); }
+      to{ opacity:1; transform:translateX(0); }
     }
     @keyframes rr-in {
       from{ opacity:0; transform:translateY(14px); }
       to{ opacity:1; transform:translateY(0); }
     }
-    @keyframes widget-pulse {
-      0%{ box-shadow: 0 0 0 0 rgba(59,130,246,0.7); }
-      70%{ box-shadow: 0 0 0 14px rgba(59,130,246,0); }
-      100%{ box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+    @keyframes live-pulse {
+      0%,100%{ opacity:1; }
+      50%{ opacity:0.4; }
     }
-    @keyframes widget-bounce {
-      0%,100%{ transform:scale(1); }
-      40%{ transform:scale(1.13); }
-      60%{ transform:scale(0.95); }
-      80%{ transform:scale(1.05); }
+    @keyframes apexEq {
+      0%,100%{ height:4px; }
+      50%{ height:13px; }
     }
-    @keyframes msg-in {
-      from{ opacity:0; transform:translateY(10px); }
-      to{ opacity:1; transform:translateY(0); }
-    }
-    @keyframes typing-dot {
-      0%,80%,100%{ transform:translateY(0); opacity:0.4; }
-      40%{ transform:translateY(-5px); opacity:1; }
-    }
-    @keyframes step-in {
-      from{ opacity:0; transform:translateX(-16px); }
-      to{ opacity:1; transform:translateX(0); }
+    @keyframes panel-open {
+      from{ opacity:0; transform:translateY(10px) scale(0.97); }
+      to{ opacity:1; transform:translateY(0) scale(1); }
     }
 
-    /* ── SCREEN 1: Intro ─────────────────────────────────────── */
-    #s-intro {
-      background:
-        radial-gradient(ellipse 70% 55% at 50% 10%, rgba(59,130,246,0.14) 0%, transparent 70%),
-        linear-gradient(180deg, #060c24 0%, #04081a 100%);
-      justify-content: space-between;
+    /* ── Global header ───────────────────────────────────────── */
+    .global-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(4,8,26,0.80);
+      backdrop-filter: blur(12px);
+      flex-shrink: 0; z-index: 10;
     }
-    .intro-body {
+    .apex-brand { display: flex; align-items: center; gap: 9px; }
+    .apex-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(140deg, #4f96ff, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff;
+    }
+    .apex-brand-text { font-size: 13px; font-weight: 700; color: var(--text); }
+    .apex-brand-sub  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .client-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 4px 12px; border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      font-size: 11px; color: var(--text-2);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); animation: pulse-dot 2s infinite;
+    }
+    .nar-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 12px; border-radius: 20px;
+      background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.22);
+      font-size: 11px; color: var(--blue-hi);
+    }
+    .apex-eq {
+      display: inline-flex; align-items: flex-end; gap: 2px; height: 14px;
+    }
+    .apex-eq span {
+      display: inline-block; width: 3px; background: var(--blue-hi);
+      border-radius: 2px; height: 4px;
+      animation: apexEq 0.7s ease infinite;
+    }
+    .apex-eq span:nth-child(2){ animation-delay:0.15s; height:8px; }
+    .apex-eq span:nth-child(3){ animation-delay:0.30s; }
+    .apex-eq span:nth-child(4){ animation-delay:0.10s; height:6px; }
+
+    /* ══════════════════════════════════════════════════
+       SCREEN 1 — Desktop browser scene
+    ══════════════════════════════════════════════════ */
+    #s-main {
+      background:
+        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(59,130,246,0.11) 0%, transparent 65%),
+        linear-gradient(180deg, #060c24 0%, #04081a 100%);
+    }
+    .main-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 32px 24px 24px;
-      position: relative;
+      padding: 16px 24px 12px;
+      min-height: 0;
     }
-    .intro-scene {
-      width: 100%; max-width: 520px;
-      display: flex; flex-direction: column; align-items: center; gap: 28px;
+    /* Browser chrome + viewport fill the available space */
+    .browser-wrap {
+      width: 100%; max-width: 860px;
+      flex: 1; display: flex; flex-direction: column;
+      min-height: 0;
     }
-    .intro-eyebrow {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--blue-hi);
-      padding: 4px 12px; border-radius: 20px;
-      background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.25);
-    }
-    .intro-headline {
-      font-size: clamp(22px, 3.5vw, 32px); font-weight: 800;
-      text-align: center; line-height: 1.25; color: var(--text);
-    }
-    .intro-headline em { color: var(--blue-hi); font-style: normal; }
-    .intro-sub {
-      font-size: 14px; color: var(--text-2); text-align: center;
-      line-height: 1.6; max-width: 400px;
-    }
-
-    /* Website mockup card — shows Ava widget */
-    .site-preview-card {
-      width: 100%; max-width: 480px;
-      background: rgba(255,255,255,0.04);
+    .browser-chrome {
+      background: #1b2236;
       border: 1px solid var(--border-mid);
-      border-radius: 20px; overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-      animation: card-float 5s ease-in-out infinite;
-      position: relative;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      padding: 9px 14px;
+      display: flex; align-items: center; gap: 7px;
+      flex-shrink: 0;
     }
-    .browser-bar {
-      background: rgba(255,255,255,0.06);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .browser-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--border-hi);
-    }
-    .browser-dot:nth-child(1){ background: #ef4444; }
-    .browser-dot:nth-child(2){ background: #f59e0b; }
-    .browser-dot:nth-child(3){ background: #22c55e; }
-    .browser-url {
+    .bdot { width: 11px; height: 11px; border-radius: 50%; }
+    .bdot-r { background: #ef4444; }
+    .bdot-y { background: #f59e0b; }
+    .bdot-g { background: #22c55e; }
+    .b-url-bar {
       flex: 1; margin-left: 8px;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.06);
       border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 10px;
-      font-size: 11px; color: var(--text-muted);
+      border-radius: 6px; padding: 4px 12px;
+      font-size: 11.5px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
     }
-    .site-body {
-      padding: 24px; min-height: 160px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .site-headline-mock { height: 12px; width: 55%; background: rgba(255,255,255,0.1); border-radius: 4px; }
-    .site-body-mock { height: 8px; width: 80%; background: rgba(255,255,255,0.06); border-radius: 4px; }
-    .site-body-mock:nth-child(3) { width: 65%; }
-    .site-body-mock:nth-child(4) { width: 72%; }
-    .site-cta-mock {
-      height: 28px; width: 130px; border-radius: 8px;
-      background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(37,99,235,0.2));
-      border: 1px solid rgba(59,130,246,0.3); margin-top: 6px;
+    .b-lock { font-size: 10px; color: #4ade80; }
+    .browser-viewport {
+      flex: 1; min-height: 0;
+      border: 1px solid var(--border-mid);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      background: #0c1329;
+      position: relative; overflow: hidden;
     }
 
-    /* Ava widget — floated in lower-right of site preview */
-    .ava-widget {
-      position: absolute; bottom: 20px; right: 20px;
-      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+    /* Blue Ridge website inside viewport */
+    .site-content { height: 100%; display: flex; flex-direction: column; }
+    .site-nav {
+      padding: 12px 22px; display: flex; align-items: center; justify-content: space-between;
+      background: #0a1020; border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
     }
-    .ava-bubble-preview {
-      background: rgba(15,22,50,0.96);
-      border: 1px solid rgba(59,130,246,0.35);
-      border-radius: 16px 16px 4px 16px;
-      padding: 10px 14px;
-      font-size: 12px; color: var(--text-2);
-      max-width: 200px; line-height: 1.45;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      opacity: 0; transform: translateY(8px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .ava-bubble-preview.shown { opacity: 1; transform: translateY(0); }
-    .ava-fab {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue), #2563eb);
+    .site-logo { display: flex; align-items: center; gap: 9px; }
+    .site-logo-mark {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.4);
-      position: relative; transition: transform 0.2s ease;
+      font-size: 17px;
     }
-    .ava-fab.pulse { animation: widget-pulse 1.5s ease 0.3s 1, widget-bounce 0.6s ease 1.8s 1; }
-    .ava-online-dot {
-      position: absolute; bottom: 2px; right: 2px;
-      width: 13px; height: 13px; border-radius: 50%;
-      background: var(--green); border: 2px solid var(--bg);
+    .site-logo-name { font-size: 13px; font-weight: 800; color: #e2e8f0; line-height: 1.15; }
+    .site-logo-sub  { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; }
+    .site-nav-links { display: flex; gap: 22px; }
+    .site-nav-link { font-size: 12px; color: #64748b; }
+    .site-nav-cta {
+      padding: 6px 16px; border-radius: 7px;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: #fff; font-size: 11.5px; font-weight: 700;
+    }
+    .site-hero {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 18px 24px; gap: 13px; position: relative;
+    }
+    .site-eyebrow {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+      color: #60a5fa; padding: 3px 10px; border-radius: 20px;
+      background: rgba(59,130,246,0.11); border: 1px solid rgba(59,130,246,0.2);
+    }
+    .site-h1 {
+      font-size: clamp(16px, 2.6vw, 26px); font-weight: 800;
+      color: #f1f5f9; text-align: center; line-height: 1.2;
+    }
+    .site-h1 em { color: #60a5fa; font-style: normal; }
+    .site-sub {
+      font-size: 12px; color: #64748b; text-align: center;
+      max-width: 360px; line-height: 1.55;
+    }
+    .site-cta-row { display: flex; gap: 10px; margin-top: 2px; }
+    .site-btn-primary {
+      padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 700;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; cursor: default;
+    }
+    .site-btn-outline {
+      padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 600;
+      background: transparent; color: #475569;
+      border: 1px solid rgba(255,255,255,0.10); cursor: default;
+    }
+    /* Trust badges row */
+    .site-trust {
+      display: flex; gap: 16px; margin-top: 4px;
+    }
+    .trust-item { font-size: 10px; color: #475569; display: flex; align-items: center; gap: 4px; }
+    .trust-item span { color: #4ade80; }
+
+    /* Ava chat widget in lower-right of browser viewport */
+    .ava-widget-wrap {
+      position: absolute; bottom: 14px; right: 14px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      z-index: 20;
+    }
+    .ava-chat-panel {
+      width: 260px;
+      background: rgba(7,12,32,0.98);
+      border: 1px solid rgba(59,130,246,0.26);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(59,130,246,0.08);
+      display: none;
+      flex-direction: column;
+      max-height: 290px;
+      animation: panel-open 0.35s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .ava-chat-panel.open { display: flex; }
+    .ava-panel-header {
+      padding: 10px 13px; display: flex; align-items: center; gap: 9px;
+      background: rgba(59,130,246,0.10); border-bottom: 1px solid rgba(59,130,246,0.16);
+      flex-shrink: 0;
+    }
+    .ava-avatar-sm {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .ava-panel-name { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+    .ava-panel-status { font-size: 10px; color: var(--green-hi); display: flex; align-items: center; gap: 4px; }
+    .ava-panel-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
+    .ava-messages {
+      flex: 1; overflow-y: auto; padding: 10px 9px; display: flex; flex-direction: column; gap: 7px;
+      scrollbar-width: none; min-height: 0;
+    }
+    .ava-messages::-webkit-scrollbar { display: none; }
+    .msg-bubble {
+      padding: 7px 10px; border-radius: 10px;
+      font-size: 11px; line-height: 1.45; max-width: 88%;
+      animation: msg-in 0.28s ease both;
+    }
+    .msg-ava .msg-bubble {
+      background: rgba(59,130,246,0.13); border: 1px solid rgba(59,130,246,0.20);
+      color: #e2e8f0; align-self: flex-start; border-radius: 4px 10px 10px 10px;
+    }
+    .msg-user .msg-bubble {
+      background: rgba(59,130,246,0.26); border: 1px solid rgba(59,130,246,0.38);
+      color: #f1f5f9; align-self: flex-end; border-radius: 10px 4px 10px 10px;
+    }
+    .msg-ava, .msg-user { display: flex; flex-direction: column; }
+    .quick-actions { display: flex; flex-direction: column; gap: 4px; animation: msg-in 0.28s ease both; }
+    .qa-btn {
+      padding: 6px 10px; border-radius: 7px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border-mid);
+      color: var(--text-muted); font-size: 10.5px; font-weight: 600;
+      cursor: default; text-align: left;
+    }
+    .qa-btn.selected {
+      background: rgba(59,130,246,0.16); border-color: rgba(59,130,246,0.38);
+      color: var(--blue-hi);
+    }
+    .typing-ind {
+      display: flex; align-items: center; gap: 4px;
+      padding: 7px 10px; border-radius: 4px 10px 10px 10px;
+      background: rgba(59,130,246,0.09); border: 1px solid rgba(59,130,246,0.16);
+      width: fit-content;
+    }
+    .td {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--text-muted); animation: typing-dot 1.2s infinite;
+    }
+    .td:nth-child(2){ animation-delay:0.15s; }
+    .td:nth-child(3){ animation-delay:0.30s; }
+    .ava-fab {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: default;
+      box-shadow: 0 4px 18px rgba(59,130,246,0.42);
+      position: relative; flex-shrink: 0;
+    }
+    .ava-fab.pulse { animation: widget-pulse 1.4s ease 0s 1, widget-bounce 0.55s ease 1.4s 1; }
+    .ava-fab-dot {
+      position: absolute; bottom: 1px; right: 1px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--green); border: 2px solid #0c1329;
       animation: pulse-dot 2s infinite;
     }
 
-    /* Start button */
-    .start-demo-btn {
-      padding: 14px 36px; border-radius: 12px; border: none; cursor: pointer;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff; font-size: 15px; font-weight: 700;
-      box-shadow: 0 8px 32px rgba(59,130,246,0.35);
-      transition: opacity 0.3s ease, transform 0.15s ease;
-    }
-    .start-demo-btn:hover { opacity: 0.9; transform: scale(1.02); }
-    .start-demo-btn.hidden-btn { display: none; }
-    .intro-footer {
-      text-align: center; font-size: 11px; color: var(--text-dim);
-      padding: 0 24px 20px;
-    }
-
-    /* ── SCREEN 2: Chat Demo ─────────────────────────────────── */
-    #s-chat {
-      background:
-        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(59,130,246,0.10) 0%, transparent 65%),
-        linear-gradient(180deg, #060c24 0%, #04081a 100%);
-    }
-    .chat-demo-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(4,8,26,0.72); backdrop-filter: blur(12px);
-      flex-shrink: 0;
-    }
-    .chat-live-chip {
-      display: flex; align-items: center; gap: 7px;
-      padding: 5px 12px; border-radius: 20px;
-      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.25);
-      font-size: 11px; font-weight: 600; color: var(--green-hi);
-    }
-    .chat-live-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); animation: pulse-dot 1.2s infinite;
-    }
-    .chat-ctrl-row { display: flex; align-items: center; gap: 8px; }
-    .ctrl-btn {
-      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-mid);
-      background: rgba(255,255,255,0.04); color: var(--text-2);
-      font-size: 12px; font-weight: 600; cursor: pointer;
-      transition: background 0.15s;
-    }
-    .ctrl-btn:hover { background: rgba(255,255,255,0.09); }
-
-    .chat-stage {
-      flex: 1; display: flex; align-items: flex-end; justify-content: center;
-      padding: 20px 20px 28px; overflow: hidden; position: relative;
-    }
-    .chat-window {
-      width: 100%; max-width: 400px;
-      background: rgba(10,16,38,0.92);
-      border: 1px solid rgba(59,130,246,0.25);
-      border-radius: 24px;
-      display: flex; flex-direction: column;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(59,130,246,0.1);
-      max-height: calc(100vh - 130px); overflow: hidden;
-    }
-    .chat-win-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-      flex-shrink: 0;
-    }
-    .chat-av {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; flex-shrink: 0;
-      box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
-    }
-    .chat-win-info { flex: 1; }
-    .chat-win-name { font-size: 13px; font-weight: 700; color: var(--text); }
-    .chat-win-status {
-      font-size: 11px; color: var(--green-hi);
-      display: flex; align-items: center; gap: 5px;
-    }
-    .chat-win-status::before {
-      content: '';
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); display: inline-block;
-      animation: pulse-dot 1.5s infinite;
-    }
-    .chat-win-close { color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px; }
-    .messages-area {
-      flex: 1; overflow-y: auto; padding: 16px 14px;
-      display: flex; flex-direction: column; gap: 10px;
-      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
-    }
-    .messages-area::-webkit-scrollbar { width: 4px; }
-    .messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-
-    /* Messages */
-    .chat-msg {
-      display: flex; flex-direction: column; gap: 2px;
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 0.35s cubic-bezier(0.22,1,0.36,1), transform 0.35s cubic-bezier(0.22,1,0.36,1);
-      max-width: 85%;
-    }
-    .chat-msg.visible { opacity: 1; transform: translateY(0); }
-    .chat-msg.from-ava { align-self: flex-start; }
-    .chat-msg.from-user { align-self: flex-end; }
-    .msg-bubble {
-      padding: 9px 13px; border-radius: 16px;
-      font-size: 13px; line-height: 1.5; color: var(--text);
-    }
-    .from-ava .msg-bubble {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid var(--border-mid);
-      border-bottom-left-radius: 4px;
-    }
-    .from-user .msg-bubble {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      border-bottom-right-radius: 4px;
-      color: #fff;
-    }
-    .msg-sender { font-size: 10px; color: var(--text-muted); padding: 0 4px; }
-
-    /* Action buttons inside chat */
-    .chat-actions {
-      display: flex; flex-direction: column; gap: 7px;
-      padding: 4px 0 2px;
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-    .chat-actions.visible { opacity: 1; transform: translateY(0); }
-    .chat-action-btn {
-      padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer;
-      background: rgba(59,130,246,0.12);
-      border: 1px solid rgba(59,130,246,0.28);
-      color: var(--blue-hi); font-size: 12px; font-weight: 600;
-      text-align: left; transition: background 0.15s;
-    }
-    .chat-action-btn:hover { background: rgba(59,130,246,0.22); }
-    .chat-action-btn.selected {
-      background: linear-gradient(135deg, rgba(59,130,246,0.35), rgba(37,99,235,0.25));
-      border-color: rgba(59,130,246,0.5);
-    }
-
-    /* Typing indicator */
-    .typing-indicator {
-      display: flex; align-items: center; gap: 4px;
-      padding: 10px 13px; border-radius: 16px; border-bottom-left-radius: 4px;
-      background: rgba(255,255,255,0.07); border: 1px solid var(--border-mid);
-      align-self: flex-start; width: fit-content;
-      opacity: 0; transition: opacity 0.2s ease;
-    }
-    .typing-indicator.visible { opacity: 1; }
-    .typing-indicator i {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--text-muted); display: block;
-      animation: typing-dot 1.2s ease-in-out infinite;
-    }
-    .typing-indicator i:nth-child(2){ animation-delay: 0.2s; }
-    .typing-indicator i:nth-child(3){ animation-delay: 0.4s; }
-
-    /* Chat input bar (decorative) */
-    .chat-input-bar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 14px; border-top: 1px solid var(--border);
-      background: rgba(255,255,255,0.02); flex-shrink: 0;
-    }
-    .chat-input-field {
-      flex: 1; background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border); border-radius: 8px;
-      padding: 8px 12px; font-size: 12px; color: var(--text-muted);
-      pointer-events: none;
-    }
-    .chat-send-btn {
-      width: 32px; height: 32px; border-radius: 8px; border: none;
-      background: linear-gradient(135deg, var(--blue), #2563eb);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 14px; flex-shrink: 0;
-    }
-
-    /* ── SCREEN 3: Automation Sequence ───────────────────────── */
+    /* ══════════════════════════════════════════════════
+       SCREEN 2 — Automation steps
+    ══════════════════════════════════════════════════ */
     #s-auto {
       background:
-        radial-gradient(ellipse 50% 40% at 30% 20%, rgba(139,92,246,0.10) 0%, transparent 65%),
-        radial-gradient(ellipse 50% 40% at 70% 80%, rgba(34,197,94,0.08) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(59,130,246,0.11) 0%, transparent 65%),
         linear-gradient(180deg, #060c24 0%, #04081a 100%);
     }
     .auto-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 24px;
+      padding: 20px 28px;
     }
-    .auto-inner { width: 100%; max-width: 520px; }
-    .auto-eyebrow {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--purple-hi); margin-bottom: 10px;
+    .auto-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--blue-hi); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 7px;
     }
-    .auto-headline {
-      font-size: clamp(18px, 2.8vw, 24px); font-weight: 800; color: var(--text);
-      margin-bottom: 6px; line-height: 1.25;
-    }
-    .auto-sub {
-      font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;
-    }
-    .auto-steps { display: flex; flex-direction: column; gap: 10px; }
+    .auto-label-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: pulse-dot 1.2s infinite; }
+    .auto-steps { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 9px; }
     .auto-step {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 14px 16px; border-radius: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      opacity: 0; transform: translateX(-16px);
-      transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1), transform 0.4s cubic-bezier(0.22,1,0.36,1),
-                  border-color 0.3s ease, background 0.3s ease;
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 17px; border-radius: 12px;
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      opacity: 0;
     }
-    .auto-step.visible { opacity: 1; transform: translateX(0); }
     .auto-step.done {
-      border-color: rgba(34,197,94,0.25);
-      background: rgba(34,197,94,0.05);
+      border-color: rgba(34,197,94,0.22);
+      background: rgba(34,197,94,0.04);
     }
-    .step-icon {
-      width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    .auto-icon {
+      width: 36px; height: 36px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px; background: rgba(255,255,255,0.06);
+      font-size: 16px; flex-shrink: 0;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border-mid);
     }
-    .auto-step.done .step-icon {
-      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.3);
-    }
-    .step-content { flex: 1; }
-    .step-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .step-detail { font-size: 11px; color: var(--text-muted); }
-    .step-check {
-      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    .auto-step.done .auto-icon { background: rgba(34,197,94,0.10); border-color: rgba(34,197,94,0.24); }
+    .auto-text { flex: 1; min-width: 0; }
+    .auto-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .auto-desc  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .auto-step.done .auto-desc { color: var(--green-hi); }
+    .auto-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.32);
       display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-      color: var(--text-dim); font-size: 11px;
-      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+      font-size: 11px; color: var(--green-hi);
+      opacity: 0; transform: scale(0.5);
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auto-step.done .step-check {
-      background: var(--green); border-color: var(--green); color: #fff;
-    }
+    .auto-step.done .auto-check { opacity: 1; transform: scale(1); }
 
-    /* ── SCREEN 4: Summary ───────────────────────────────────── */
+    /* ══════════════════════════════════════════════════
+       SCREEN 3 — CRM result + live widget
+    ══════════════════════════════════════════════════ */
     #s-summary {
       background:
-        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 65%),
-        radial-gradient(ellipse 50% 40% at 80% 90%, rgba(34,197,94,0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(34,197,94,0.09) 0%, transparent 65%),
         linear-gradient(180deg, #060c24 0%, #04081a 100%);
     }
-    .summary-scroll { flex: 1; overflow-y: auto; padding: 48px 28px 80px; }
-    .summary-scroll::-webkit-scrollbar { width: 4px; }
-    .summary-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .summary-inner { max-width: 880px; margin: 0 auto; }
-
-    .success-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 14px; border-radius: 20px;
-      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.25);
-      font-size: 11px; font-weight: 600; color: var(--green-hi);
-      margin-bottom: 20px;
+    .summary-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px 24px 12px; gap: 12px;
+      position: relative; min-height: 0;
     }
-    .success-pill-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
-    .summary-headline { font-size: clamp(24px, 4vw, 38px); font-weight: 800; line-height: 1.2; color: var(--text); margin-bottom: 14px; }
-    .summary-sub { font-size: 15px; color: var(--text-2); line-height: 1.65; margin-bottom: 36px; max-width: 700px; }
 
-    /* rr-card */
+    /* Camera-pan handled via JS — see .apex-cpan-pre / .apex-cpan-in */
     .rr-card {
-      background: rgba(255,255,255,0.03);
+      width: 100%; max-width: 520px;
+      background: rgba(255,255,255,0.028);
       border: 1px solid var(--border-mid);
-      border-radius: 20px; padding: 24px;
-      margin-bottom: 20px;
-      animation: rr-in 0.6s ease both;
+      border-radius: 16px; overflow: hidden;
     }
-    .rr-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .rr-step {
-      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    .rr-card-header {
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+      background: rgba(34,197,94,0.05); border-bottom: 1px solid var(--border);
     }
-    .rr-step.leak    { background: var(--red-dim); border: 1px solid rgba(239,68,68,0.25); color: var(--red-hi); }
-    .rr-step.recovery{ background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.25); color: var(--blue-hi); }
-    .rr-step.recovered{ background: var(--green-dim); border: 1px solid rgba(34,197,94,0.25); color: var(--green-hi); }
-    .rr-arrow { color: var(--text-dim); font-size: 13px; }
+    .rr-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .rr-contact-info { flex: 1; min-width: 0; }
+    .rr-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .rr-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
     .rr-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 700; color: var(--green-hi);
-      margin-bottom: 8px;
+      padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700;
+      background: var(--red-dim); border: 1px solid rgba(239,68,68,0.26);
+      color: var(--red-hi); display: flex; align-items: center; gap: 5px;
+      white-space: nowrap;
     }
-    .rr-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
-    .rr-headline { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-    .rr-status { font-size: 13px; color: var(--text-2); margin-bottom: 12px; }
-    .rr-result {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border-radius: 10px;
-      background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
-      font-size: 13px; font-weight: 600; color: var(--green-hi);
+    .rr-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse-dot 1.2s infinite; }
+    .rr-fields { padding: 14px 18px; display: flex; flex-direction: column; gap: 9px; }
+    .rr-field { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .rr-field-label { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .rr-field-value { font-size: 12px; font-weight: 600; color: var(--text-2); text-align: right; }
+    .rr-field-value.val-red    { color: var(--red-hi); }
+    .rr-field-value.val-green  { color: var(--green-hi); }
+    .rr-field-value.val-amber  { color: var(--amber-hi); }
+    .rr-field-value.val-check  { color: var(--green-hi); display: flex; align-items: center; gap: 5px; }
+    .rr-field-value.val-check::before { content: '✓'; font-size: 12px; }
+    .rr-divider { height: 1px; background: var(--border); margin: 2px 0; }
+    .rr-value-row {
+      padding: 13px 18px; display: flex; align-items: center; justify-content: space-between;
+      background: rgba(34,197,94,0.045); border-top: 1px solid var(--border);
     }
-    .rr-result span { font-weight: 400; color: var(--text-muted); font-size: 11px; margin-right: 4px; }
+    .rr-value-label  { font-size: 11px; color: var(--text-muted); }
+    .rr-value-amount { font-size: 22px; font-weight: 800; color: var(--green-hi); font-variant-numeric: tabular-nums; }
 
-    /* stats-row */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .stat-card {
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px 14px; text-align: center;
+    /* Stats row */
+    .stats-row {
+      width: 100%; max-width: 520px;
+      display: flex; gap: 10px;
     }
-    .stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
-    .stat-val { font-size: 22px; font-weight: 800; color: var(--text); }
+    .stat-pill {
+      flex: 1; padding: 11px 14px; border-radius: 11px;
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-pill-val { font-size: 16px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+    .stat-pill-lab { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
 
-    /* contact-card */
-    .contact-card {
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border-mid);
-      border-radius: 20px; padding: 22px; margin-bottom: 20px;
+    /* Live widget reveal — visual replica in lower-right of summary-body */
+    .live-reveal {
+      position: absolute; bottom: 14px; right: 18px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
     }
-    .contact-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .contact-av {
-      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-      background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.3);
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    .live-reveal.shown { opacity: 1; transform: translateY(0); }
+    .live-badge {
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 20px;
+      background: rgba(34,197,94,0.14); border: 1px solid rgba(34,197,94,0.28);
+      font-size: 9px; font-weight: 700; color: var(--green-hi);
+      letter-spacing: 0.09em; text-transform: uppercase;
     }
-    .contact-card-tag { font-size: 12px; font-weight: 700; color: var(--text); }
-    .contact-card-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
-    .contact-field-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
-    .contact-field-value { font-size: 13px; font-weight: 600; color: var(--text-2); }
-    .contact-field-value.booked { color: var(--green-hi); }
+    .live-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: live-pulse 1.2s infinite; }
+    /* Pixel-accurate replica of the GHL chat widget launcher button */
+    .live-fab {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; cursor: default;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.45), 0 0 0 2px rgba(59,130,246,0.18);
+      position: relative;
+    }
+    .live-fab-dot {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: #22c55e; border: 2px solid #04081a;
+      animation: pulse-dot 2s infinite;
+    }
 
-    /* pipeline-wrap */
-    .pipeline-wrap { margin-bottom: 20px; }
-    .pipeline-label { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
-    .pipeline-track {
-      display: flex; align-items: center; flex-wrap: wrap; gap: 0;
-      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px 20px; overflow-x: auto;
+    /* ── Continue button + footer ─────────────────────────────── */
+    .chapter-footer {
+      padding: 12px 24px 18px;
+      display: flex; justify-content: flex-start;
+      flex-shrink: 0;
     }
-    .pipe-stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 70px; }
-    .pipe-dot {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); border: 2px solid var(--border);
+    /* summary footer: centered but with right margin so widget replica doesn't overlap */
+    #s-summary .chapter-footer {
+      justify-content: center;
+      padding-right: 90px; /* clear the live-reveal widget area (52px fab + 18px offset + padding) */
     }
-    .pipe-dot.done  { background: var(--green); border-color: var(--green); }
-    .pipe-dot.active{ background: var(--blue); border-color: var(--blue); box-shadow: 0 0 0 4px rgba(59,130,246,0.2); }
-    .pipe-name { font-size: 10px; color: var(--text-dim); text-align: center; line-height: 1.3; }
-    .pipe-name.done  { color: var(--green-hi); }
-    .pipe-name.active{ color: var(--blue-hi); font-weight: 700; }
-    .pipe-connector { flex: 1; height: 2px; background: rgba(255,255,255,0.08); min-width: 20px; }
-    .pipe-connector.done { background: var(--green); }
-
-    /* recovery-divider */
-    .recovery-divider { display: flex; align-items: center; gap: 16px; margin: 28px 0; }
-    .recovery-line { flex: 1; height: 1px; background: var(--border); }
-    .recovery-tagline { font-size: 13px; color: var(--text-2); text-align: center; white-space: nowrap; line-height: 1.6; }
-    .recovery-tagline em { color: var(--blue-hi); font-style: normal; }
-
-    /* recovery-card */
-    .recovery-card {
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border-mid);
-      border-radius: 20px; padding: 24px; margin-bottom: 20px;
-    }
-    .recovery-compare { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
-    .compare-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-    .compare-heading { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.07em; text-transform: uppercase; }
-    .compare-outcome { font-size: 12px; color: var(--text-2); line-height: 1.4; }
-    .compare-value { font-size: 28px; font-weight: 800; }
-    .lost-val   { color: var(--red-hi); }
-    .gained-val { color: var(--green-hi); }
-    .compare-note { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
-    .compare-arrow { font-size: 22px; color: var(--text-dim); padding-top: 40px; }
-
-    .recovery-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-    .recovery-bar-range { color: var(--green-hi); font-weight: 600; }
-    .recovery-bar-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
-    .recovery-bar-fill { height: 100%; width: 0%; border-radius: 4px; background: linear-gradient(90deg, #22c55e, #86efac); transition: width 1.6s cubic-bezier(0.22,1,0.36,1); }
-
-    /* cta-card */
-    .cta-card {
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border-mid);
-      border-radius: 20px; padding: 28px; margin-bottom: 20px;
-    }
-    .cta-eyebrow { font-size: 10px; color: var(--text-muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 10px; }
-    .cta-headline { font-size: clamp(16px, 2.5vw, 22px); font-weight: 800; color: var(--text); margin-bottom: 12px; line-height: 1.3; }
-    .cta-body { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 22px; }
-    .cta-metrics { display: flex; gap: 0; margin-bottom: 22px; }
-    .cta-metric { flex: 1; text-align: center; border-right: 1px solid var(--border); }
-    .cta-metric:last-child { border-right: none; }
-    .cta-metric-val { font-size: 24px; font-weight: 800; color: var(--blue-hi); }
-    .cta-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-    .cta-btn {
-      display: inline-block; padding: 13px 28px; border-radius: 10px;
+    .continue-btn {
+      padding: 12px 36px; border-radius: 12px; border: none; cursor: pointer;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: #fff; font-size: 14px; font-weight: 700;
-      text-decoration: none; margin-bottom: 14px;
-      box-shadow: 0 6px 24px rgba(59,130,246,0.35);
+      box-shadow: 0 6px 24px rgba(59,130,246,0.30);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.15s ease;
     }
-    .cta-fine { font-size: 11px; color: var(--text-dim); }
+    .continue-btn.visible { opacity: 1; pointer-events: all; }
+    .continue-btn:hover { transform: scale(1.025); }
 
-    /* ── Camera-pan reveal system ────────────────────────────── */
-    .apex-cpan-pre {
-      opacity: 0 !important; transform: translateY(48px) !important;
-      transition: none !important;
-    }
-    .apex-cpan-in {
-      opacity: 1 !important; transform: translateY(0) !important;
-      transition: opacity 0.75s cubic-bezier(0.25,0.46,0.45,0.94),
-                  transform 0.75s cubic-bezier(0.25,0.46,0.45,0.94) !important;
-    }
-
-    /* ── Narration pill ──────────────────────────────────────── */
-    .apex-mf-pill {
-      position: fixed; left: 18px; bottom: 18px; z-index: 99999;
-      display: none; align-items: center; gap: 8px;
-      padding: 7px 14px; border-radius: 24px;
-      background: rgba(15,22,50,0.9); backdrop-filter: blur(8px);
-      border: 1px solid rgba(59,130,246,0.3);
-      font-size: 12px; color: var(--blue-hi); font-weight: 600;
-    }
-    .apex-mf-pill.is-on { display: inline-flex; }
-    .apex-mf-eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .apex-mf-eq i {
-      width: 3px; height: 4px; background: var(--blue-hi);
-      border-radius: 1px; display: block;
-      animation: apexEq 0.8s ease-in-out infinite alternate;
-    }
-    .apex-mf-eq i:nth-child(2){ animation-delay: 0.15s; }
-    .apex-mf-eq i:nth-child(3){ animation-delay: 0.30s; }
-    .apex-mf-eq i:nth-child(4){ animation-delay: 0.45s; }
-
-    /* ── Continue button ─────────────────────────────────────── */
-    .apex-mf-continue-wrap {
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-      pointer-events: none; margin-top: 28px;
-    }
-    .apex-mf-continue-wrap.is-on { opacity: 1; transform: translateY(0); pointer-events: all; }
-    .apex-mf-continue {
-      padding: 14px 36px; border-radius: 12px; border: none; cursor: pointer;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff; font-size: 15px; font-weight: 700;
-      box-shadow: 0 8px 32px rgba(59,130,246,0.35); width: 100%;
-      transition: opacity 0.2s ease;
-    }
-    .apex-mf-continue:hover { opacity: 0.9; }
-
-    /* ── Mobile ──────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .global-header { padding: 12px 16px; }
-      .apex-brand-text { font-size: 12px; }
-      .apex-brand-sub { display: none; }
-      .intro-body { padding: 20px 16px; }
-      .site-preview-card { max-width: 340px; }
-      .chat-stage { padding: 12px 12px 20px; }
-      .chat-window { max-height: calc(100vh - 110px); }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .contact-grid { grid-template-columns: 1fr; }
-      .recovery-compare { flex-direction: column; align-items: center; }
-      .compare-arrow { padding-top: 0; }
-      .auto-body { padding: 16px; }
-      .pipeline-track { padding: 12px; }
-      .summary-scroll { padding: 28px 16px 60px; }
-      .cta-metrics { flex-wrap: wrap; }
-      .cta-metric { min-width: 33%; }
-    }
-    @media (max-width: 480px) {
-      .stats-row { grid-template-columns: 1fr 1fr; }
-      .cta-metrics { gap: 16px; }
-      .cta-metric { border-right: none; }
-      .browser-url { display: none; }
+    /* Mobile */
+    @media(max-width:640px){
+      .site-nav-links { display: none; }
+      .ava-chat-panel { width: 220px; }
+      .stats-row { flex-direction: column; }
+      .live-reveal { bottom: 10px; right: 12px; }
+      #s-summary .chapter-footer { padding-right: 75px; }
+      .rr-value-amount { font-size: 18px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Flash overlay -->
 <div id="flash"></div>
 
-<!-- ── SCREEN 1: Intro ──────────────────────────────────────── -->
-<div id="s-intro" class="screen active">
-  <div class="global-header">
+<!-- ══════════════════════════════════════════════════
+     SCREEN 1 — Desktop browser + live chat
+════════════════════════════════════════════════════ -->
+<div class="screen active" id="s-main">
+  <header class="global-header">
     <div class="apex-brand">
       <div class="apex-mark">A</div>
       <div>
         <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Revenue Recovery Platform</div>
+        <div class="apex-brand-sub">Website Receptionist</div>
       </div>
     </div>
     <div class="client-pill">
       <div class="status-dot"></div>
-      Blue Ridge Roofing &amp; Restoration
+      Blue Ridge Roofing
     </div>
-  </div>
-  <div class="intro-body">
-    <div class="intro-scene">
-      <div class="intro-eyebrow">Website Receptionist</div>
-      <div class="intro-headline">
-        What happens when someone visits<br>your website at <em>11pm?</em>
-      </div>
-      <div class="intro-sub">
-        Before Apex, they bounced. No one was there to answer.
-        Watch Ava catch a live emergency roof leak at 11 PM and route it directly to your team — while you sleep.
+  </header>
+
+  <div class="main-body">
+    <div class="browser-wrap">
+      <!-- Browser chrome bar -->
+      <div class="browser-chrome">
+        <div class="bdot bdot-r"></div>
+        <div class="bdot bdot-y"></div>
+        <div class="bdot bdot-g"></div>
+        <div class="b-url-bar">
+          <span class="b-lock">🔒</span>
+          blueridgeroofing.com
+        </div>
       </div>
 
-      <!-- Simulated website with chat widget -->
-      <div class="site-preview-card">
-        <div class="browser-bar">
-          <div class="browser-dot"></div>
-          <div class="browser-dot"></div>
-          <div class="browser-dot"></div>
-          <div class="browser-url">blueridgeroofing.com</div>
-        </div>
-        <div class="site-body" style="position:relative; min-height:180px;">
-          <div class="site-headline-mock"></div>
-          <div class="site-body-mock"></div>
-          <div class="site-body-mock"></div>
-          <div class="site-body-mock"></div>
-          <div class="site-cta-mock"></div>
-          <!-- Ava widget -->
-          <div class="ava-widget">
-            <div class="ava-bubble-preview" id="ava-intro-bubble">
-              👋 Need a free inspection?
+      <!-- The Blue Ridge Roofing website (mockup) -->
+      <div class="browser-viewport">
+        <div class="site-content">
+          <nav class="site-nav">
+            <div class="site-logo">
+              <div class="site-logo-mark">🏠</div>
+              <div>
+                <div class="site-logo-name">Blue Ridge Roofing</div>
+                <div class="site-logo-sub">&amp; Restoration</div>
+              </div>
             </div>
-            <div class="ava-fab" id="ava-intro-fab">
-              💬
-              <div class="ava-online-dot"></div>
+            <div class="site-nav-links">
+              <span class="site-nav-link">Services</span>
+              <span class="site-nav-link">About Us</span>
+              <span class="site-nav-link">Reviews</span>
+              <span class="site-nav-link">Contact</span>
+            </div>
+            <div class="site-nav-cta">Free Estimate</div>
+          </nav>
+
+          <div class="site-hero">
+            <div class="site-eyebrow">Waynesboro, VA — Since 1987</div>
+            <div class="site-h1">Storm Damage? We Respond<br><em>24/7 Emergency Roofing</em></div>
+            <div class="site-sub">Licensed &amp; insured. We handle your insurance claim from first call to final nail. Free inspection, written estimate within 24 hours.</div>
+            <div class="site-cta-row">
+              <div class="site-btn-primary">Get Free Inspection</div>
+              <div class="site-btn-outline">See Our Work</div>
+            </div>
+            <div class="site-trust">
+              <div class="trust-item"><span>✓</span> Licensed &amp; Insured</div>
+              <div class="trust-item"><span>✓</span> 5-Star Rated</div>
+              <div class="trust-item"><span>✓</span> Free Estimates</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <button class="start-demo-btn" id="start-btn" onclick="startWebChat()">
-        See Ava Work the Lead →
-      </button>
-    </div>
+        <!-- Ava chat widget — lower-right of browser viewport -->
+        <div class="ava-widget-wrap">
+          <div class="ava-chat-panel" id="ava-panel">
+            <div class="ava-panel-header">
+              <div class="ava-avatar-sm">🤖</div>
+              <div>
+                <div class="ava-panel-name">Ava</div>
+                <div class="ava-panel-status"><div class="ava-panel-dot"></div> Online now</div>
+              </div>
+            </div>
+            <div class="ava-messages" id="ava-msgs"></div>
+          </div>
+          <div class="ava-fab" id="ava-fab">
+            💬
+            <div class="ava-fab-dot"></div>
+          </div>
+        </div>
+      </div><!-- /browser-viewport -->
+    </div><!-- /browser-wrap -->
   </div>
-  <div class="intro-footer">
-    DEMO SIMULATION — No real contacts are created during this demonstration
-  </div>
+
+  <footer class="chapter-footer">
+    <button class="continue-btn" id="start-btn">▶ Watch Demo</button>
+  </footer>
 </div>
 
-<!-- ── SCREEN 2: Chat Demo ──────────────────────────────────── -->
-<div id="s-chat" class="screen">
-  <div class="chat-demo-header">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div class="chat-live-chip">
-        <div class="chat-live-dot"></div>
-        Live Chat — 11:07 PM
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);">blueridgeroofing.com · Visitor detected</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <button class="ctrl-btn" id="pause-btn" onclick="togglePause()">⏸ Pause</button>
-      <button class="ctrl-btn" onclick="restartDemo()">↺ Restart</button>
-      <div class="apex-brand">
-        <div class="apex-mark">A</div>
-        <div>
-          <div class="apex-brand-text">Apex AI Systems</div>
-          <div class="apex-brand-sub">Revenue Recovery Platform</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="chat-stage">
-    <div class="chat-window">
-      <div class="chat-win-header">
-        <div class="chat-av">💬</div>
-        <div class="chat-win-info">
-          <div class="chat-win-name">Ava — Roofing Specialist</div>
-          <div class="chat-win-status">Online now</div>
-        </div>
-        <div class="chat-win-close">✕</div>
-      </div>
-      <div class="messages-area" id="messages-area"></div>
-      <div class="chat-input-bar">
-        <div class="chat-input-field" id="chat-input-placeholder">Type a message…</div>
-        <div class="chat-send-btn">➤</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── SCREEN 3: Automation Sequence ────────────────────────── -->
-<div id="s-auto" class="screen">
-  <div class="global-header">
+<!-- ══════════════════════════════════════════════════
+     SCREEN 2 — Automation
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s-auto">
+  <header class="global-header">
     <div class="apex-brand">
       <div class="apex-mark">A</div>
       <div>
         <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Revenue Recovery Platform</div>
+        <div class="apex-brand-sub">Website Receptionist</div>
       </div>
     </div>
-    <div class="client-pill">
-      <div class="status-dot"></div>
-      Blue Ridge Roofing &amp; Restoration
+    <div class="nar-bar">
+      <div class="apex-eq"><span></span><span></span><span></span><span></span></div>
+      Routing emergency lead
     </div>
-  </div>
+  </header>
+
   <div class="auto-body">
-    <div class="auto-inner">
-      <div class="auto-eyebrow">🤖 Apex Automation — Firing Now</div>
-      <div class="auto-headline">Ava didn't just chat.<br>She put the lead in motion.</div>
-      <div class="auto-sub">Behind the scenes, your entire revenue engine activated in seconds.</div>
-      <div class="auto-steps" id="auto-steps">
-        <div class="auto-step" id="step-0">
-          <div class="step-icon">👤</div>
-          <div class="step-content">
-            <div class="step-title">Contact Created</div>
-            <div class="step-detail">Sarah Miller · (540) 771-2284 · Emergency Roof Leak · Website Chat</div>
-          </div>
-          <div class="step-check">○</div>
+    <div class="auto-label">
+      <div class="auto-label-dot"></div>
+      Automation Triggered
+    </div>
+    <div class="auto-steps">
+      <div class="auto-step" id="st-0">
+        <div class="auto-icon">👤</div>
+        <div class="auto-text">
+          <div class="auto-title">Contact Created</div>
+          <div class="auto-desc" id="st-0-desc">Adding Sarah Miller to GHL CRM…</div>
         </div>
-        <div class="auto-step" id="step-1">
-          <div class="step-icon">🚨</div>
-          <div class="step-content">
-            <div class="step-title">Emergency Route Selected</div>
-            <div class="step-detail">Priority: High · Pipeline: Emergency Repair · Water intrusion confirmed</div>
-          </div>
-          <div class="step-check">○</div>
+        <div class="auto-check">✓</div>
+      </div>
+      <div class="auto-step" id="st-1">
+        <div class="auto-icon">🚨</div>
+        <div class="auto-text">
+          <div class="auto-title">Emergency Route Selected</div>
+          <div class="auto-desc" id="st-1-desc">Priority: HIGH — Emergency Response Team</div>
         </div>
-        <div class="auto-step" id="step-2">
-          <div class="step-icon">💬</div>
-          <div class="step-content">
-            <div class="step-title">SMS Confirmation Sent</div>
-            <div class="step-detail">Confirmation text delivered to Sarah · "Our team has been alerted and will contact you shortly"</div>
-          </div>
-          <div class="step-check">○</div>
+        <div class="auto-check">✓</div>
+      </div>
+      <div class="auto-step" id="st-2">
+        <div class="auto-icon">💬</div>
+        <div class="auto-text">
+          <div class="auto-title">SMS Confirmation Sent</div>
+          <div class="auto-desc" id="st-2-desc">Automated text dispatched to (540) 771-2284</div>
         </div>
-        <div class="auto-step" id="step-3">
-          <div class="step-icon">🔔</div>
-          <div class="step-content">
-            <div class="step-title">Team Notified</div>
-            <div class="step-detail">Emergency Response Team alerted via SMS + GHL · 847 Elm Ridge Road · Water intrusion active</div>
-          </div>
-          <div class="step-check">○</div>
+        <div class="auto-check">✓</div>
+      </div>
+      <div class="auto-step" id="st-3">
+        <div class="auto-icon">📋</div>
+        <div class="auto-text">
+          <div class="auto-title">Team Notified</div>
+          <div class="auto-desc" id="st-3-desc">Field crew dispatched — ETA confirmed</div>
         </div>
+        <div class="auto-check">✓</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── SCREEN 4: Summary ─────────────────────────────────────── -->
-<div id="s-summary" class="screen">
-  <div class="global-header">
+<!-- ══════════════════════════════════════════════════
+     SCREEN 3 — CRM result + live widget proof
+════════════════════════════════════════════════════ -->
+<div class="screen" id="s-summary">
+  <header class="global-header">
     <div class="apex-brand">
       <div class="apex-mark">A</div>
       <div>
         <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Revenue Recovery Platform</div>
+        <div class="apex-brand-sub">Website Receptionist</div>
       </div>
     </div>
     <div class="client-pill">
       <div class="status-dot"></div>
-      Blue Ridge Roofing &amp; Restoration
+      GHL CRM Updated
     </div>
-  </div>
-  <div class="summary-scroll">
-    <div class="summary-inner" id="summary-inner">
-      <div class="success-pill">
-        <span class="success-pill-dot"></span>
-        Lead Captured — Emergency Response Triggered
-      </div>
-      <div class="summary-headline">The visitor who<br>would have bounced.</div>
-      <div class="summary-sub">
-        At 11:07 PM, Sarah Miller landed on your website with an active roof leak. No one was there.
-        Without Apex, she would have left, called a competitor, and you'd never know you lost an $18,400 job.
-        With Ava, she got an immediate response — and your emergency team was alerted within seconds.
-      </div>
+  </header>
 
-      <div class="rr-card">
-        <div class="rr-flow">
-          <span class="rr-step leak">Revenue Leak</span>
-          <span class="rr-arrow">→</span>
-          <span class="rr-step recovery">Apex Website Receptionist</span>
-          <span class="rr-arrow">→</span>
-          <span class="rr-step recovered">Revenue Recovered</span>
-        </div>
-        <div class="rr-badge"><span class="rr-dot"></span> Emergency Route Activated</div>
-        <div class="rr-headline">Emergency roof leak captured and routed to response team.</div>
-        <div class="rr-status">Status: <b>Lead Qualified</b> &nbsp;·&nbsp; Pipeline: <b>Emergency Repair</b></div>
-        <div class="rr-result"><span>Business Result</span>After-hours emergency lead captured &amp; team notified</div>
-      </div>
+  <div class="summary-body">
 
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Chat Response</div>
-          <div class="stat-val">&lt; 3s</div>
+    <!-- CRM result card -->
+    <div class="rr-card apex-cpan-pre" id="crm-card">
+      <div class="rr-card-header">
+        <div class="rr-avatar">👤</div>
+        <div class="rr-contact-info">
+          <div class="rr-name">Sarah Miller</div>
+          <div class="rr-sub">New contact · Website chat · Just now</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Priority</div>
-          <div class="stat-val">High</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Pipeline</div>
-          <div class="stat-val">Emergency</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Est. Value</div>
-          <div class="stat-val">$18.4K</div>
+        <div class="rr-badge">
+          <div class="rr-badge-dot"></div>
+          Priority High
         </div>
       </div>
-
-      <div class="contact-card">
-        <div class="contact-card-head">
-          <div class="contact-av">🚨</div>
-          <div>
-            <div class="contact-card-tag">GHL Contact Record — Website Chat Capture</div>
-            <div class="contact-card-sub">Auto-created · Website chat → emergency route → team notified</div>
-          </div>
+      <div class="rr-fields">
+        <div class="rr-field">
+          <div class="rr-field-label">Service Type</div>
+          <div class="rr-field-value val-red">Emergency Roof Leak</div>
         </div>
-        <div class="contact-grid">
-          <div>
-            <div class="contact-field-label">Contact Name</div>
-            <div class="contact-field-value">Sarah Miller</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Issue Type</div>
-            <div class="contact-field-value">Emergency Roof Leak</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Priority</div>
-            <div class="contact-field-value booked">High ⚠️</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Pipeline</div>
-            <div class="contact-field-value">Emergency Repair</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Assigned To</div>
-            <div class="contact-field-value">Emergency Response Team</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Estimated Opportunity</div>
-            <div class="contact-field-value booked">$18,400</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Next Action</div>
-            <div class="contact-field-value booked">SMS Confirmation Sent ✅</div>
-          </div>
-          <div>
-            <div class="contact-field-label">Team Status</div>
-            <div class="contact-field-value booked">Notified ✅</div>
-          </div>
+        <div class="rr-divider"></div>
+        <div class="rr-field">
+          <div class="rr-field-label">Pipeline</div>
+          <div class="rr-field-value">Emergency Repair</div>
+        </div>
+        <div class="rr-field">
+          <div class="rr-field-label">Phone</div>
+          <div class="rr-field-value">(540) 771-2284</div>
+        </div>
+        <div class="rr-divider"></div>
+        <div class="rr-field">
+          <div class="rr-field-label">SMS Confirmation</div>
+          <div class="rr-field-value val-check">Sent</div>
+        </div>
+        <div class="rr-field">
+          <div class="rr-field-label">Team Notified</div>
+          <div class="rr-field-value val-check">Confirmed</div>
         </div>
       </div>
-
-      <div class="pipeline-wrap">
-        <div class="pipeline-label">GHL Roofing Pipeline — Stage</div>
-        <div class="pipeline-track">
-          <div class="pipe-stage-wrap"><div class="pipe-dot done"></div><div class="pipe-name done">New Lead</div></div>
-          <div class="pipe-connector done"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot active"></div><div class="pipe-name active">Emergency Repair</div></div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot"></div><div class="pipe-name">Estimate Sent</div></div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot"></div><div class="pipe-name">Follow-Up</div></div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot"></div><div class="pipe-name">Job Won</div></div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot"></div><div class="pipe-name">Job Completed</div></div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-stage-wrap"><div class="pipe-dot"></div><div class="pipe-name">Review Requested</div></div>
-        </div>
+      <div class="rr-value-row">
+        <div class="rr-value-label">Estimated Opportunity</div>
+        <div class="rr-value-amount" id="job-value">$0</div>
       </div>
-
-      <div class="recovery-divider">
-        <div class="recovery-line"></div>
-        <div class="recovery-tagline">This wasn't just website traffic.<br><em>It was a recovered job.</em></div>
-        <div class="recovery-line"></div>
-      </div>
-
-      <div class="recovery-card">
-        <div class="recovery-compare">
-          <div class="compare-col lost">
-            <div class="compare-heading">Without Ava</div>
-            <div style="font-size:30px">🌐</div>
-            <div class="compare-outcome">Visitor bounces → Calls competitor in the morning</div>
-            <div class="compare-value lost-val">$0</div>
-            <div class="compare-note">Sarah finds another roofer via Google. Job scheduled for the following week.</div>
-          </div>
-          <div class="compare-arrow">→</div>
-          <div class="compare-col gained">
-            <div class="compare-heading">With Ava</div>
-            <div style="font-size:30px">✅</div>
-            <div class="compare-outcome">Chat → Emergency Route → Team Notified at 11 PM</div>
-            <div class="compare-value gained-val" id="revenue-counter">$0</div>
-            <div class="compare-note">Emergency Response Team alerted. SMS confirmation sent to Sarah. Lead secured.</div>
-          </div>
-        </div>
-        <div class="recovery-bar-label">
-          Estimated Job Recovery Value
-          <span class="recovery-bar-range">$12,000 — $24,000</span>
-        </div>
-        <div class="recovery-bar-track">
-          <div class="recovery-bar-fill" id="recovery-bar"></div>
-        </div>
-      </div>
-
-      <div class="cta-card">
-        <div class="cta-eyebrow">Apex AI Systems — Website Receptionist</div>
-        <div class="cta-headline">Every Website Visitor Is a Revenue Opportunity. Ava Never Lets One Bounce.</div>
-        <div class="cta-body">
-          Most roofing websites convert under 3% of visitors. The other 97% leave — usually to a competitor who
-          was faster to respond. Ava catches every visitor, qualifies them in real time, and books inspections
-          24 hours a day, 7 days a week — no staff required.
-        </div>
-        <div class="cta-metrics">
-          <div class="cta-metric">
-            <div class="cta-metric-val">&lt; 3s</div>
-            <div class="cta-metric-label">First Response</div>
-          </div>
-          <div class="cta-metric">
-            <div class="cta-metric-val">24/7</div>
-            <div class="cta-metric-label">Always On</div>
-          </div>
-          <div class="cta-metric">
-            <div class="cta-metric-val">100%</div>
-            <div class="cta-metric-label">Leads Captured</div>
-          </div>
-        </div>
-        <a class="cta-btn" href="https://api.leadconnectorhq.com/widget/bookings/apex-ai-discovery-call" target="_blank" rel="noopener">
-          Book Your Demo Call &nbsp;→
-        </a>
-        <div class="cta-fine">48-hour setup &nbsp;·&nbsp; No contracts &nbsp;·&nbsp; Cancel anytime</div>
-      </div>
-      <!-- Continue button injected by APEX MINI-FILM LAYER -->
     </div>
-  </div>
+
+    <!-- Stats pills -->
+    <div class="stats-row apex-cpan-pre" id="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-val" id="stat-0">0</div>
+        <div class="stat-pill-lab">Hrs Response</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-val">&lt;5s</div>
+        <div class="stat-pill-lab">First Reply</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-val">24/7</div>
+        <div class="stat-pill-lab">Always On</div>
+      </div>
+    </div>
+
+    <!-- Live GHL widget visual proof (replica — no script, no duplicate) -->
+    <div class="live-reveal" id="live-reveal">
+      <div class="live-badge"><div class="live-badge-dot"></div> LIVE WIDGET</div>
+      <div class="live-fab">
+        💬
+        <div class="live-fab-dot"></div>
+      </div>
+    </div>
+
+  </div><!-- /summary-body -->
+
+  <footer class="chapter-footer">
+    <button class="continue-btn" id="continue-btn">Continue →</button>
+  </footer>
 </div>
 
-<!-- Narration pill -->
-<div class="apex-mf-pill" id="apex-mf-pill">
-  <span class="apex-mf-eq"><i></i><i></i><i></i><i></i></span>
-  <span>Jon is narrating</span>
-</div>
-
-<script>
-/* =============================================================
-   WEBSITE RECEPTIONIST — CHAPTER LOGIC
-   DEMO SIMULATION — No real contacts or SMS are created.
-   ============================================================= */
-
-var _paused     = false;
-var _chatTimers = [];
-var _chatStarted= false;
-var _autoFired  = false;
-
-/* ── Screen manager ─────────────────────────────────────────── */
-function showScreen(id) {
-  var flash = document.getElementById('flash');
-  flash.classList.add('on');
-  setTimeout(function(){ flash.classList.remove('on'); }, 280);
-
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  var next = document.getElementById(id);
-  if(next) next.classList.add('active');
-}
-
-/* ── Pause / restart ────────────────────────────────────────── */
-function togglePause() {
-  _paused = !_paused;
-  var btn = document.getElementById('pause-btn');
-  if(btn) btn.textContent = _paused ? '▶ Resume' : '⏸ Pause';
-}
-
-function restartDemo() {
-  _chatTimers.forEach(clearTimeout); _chatTimers = [];
-  _chatStarted = false; _autoFired = false; _paused = false;
-  var btn = document.getElementById('pause-btn');
-  if(btn) btn.textContent = '⏸ Pause';
-  document.getElementById('messages-area').innerHTML = '';
-  document.getElementById('chat-input-placeholder').textContent = 'Type a message…';
-  var steps = document.querySelectorAll('.auto-step');
-  steps.forEach(function(s){ s.classList.remove('visible','done'); s.querySelector('.step-check').textContent = '○'; });
-  document.getElementById('start-btn').classList.remove('hidden-btn');
-  _bubbleIdx = 0;
-  // Reset summary reveal
-  clearReveal();
-  hideContinue();
-  document.getElementById('recovery-bar').style.width = '0%';
-  document.getElementById('revenue-counter').textContent = '$0';
-  showScreen('s-intro');
-  // Show ava bubble preview again
-  setTimeout(function(){ pulseWidget(); }, 800);
-}
-
-/* ── Intro widget animation ─────────────────────────────────── */
-var _BUBBLE_MSGS = [
-  '👋 Need a free inspection?',
-  '⛈️ Storm damage?',
-  '💬 Questions about your roof?',
-  '🚨 Need emergency repairs?'
-];
-var _bubbleIdx = 0;
-var _widgetPulseTimer = null;
-
-function pulseWidget() {
-  var bubble = document.getElementById('ava-intro-bubble');
-  var fab    = document.getElementById('ava-intro-fab');
-  if(!bubble || !fab) return;
-  // Rotate message — fade out, swap, fade in
-  bubble.classList.remove('shown');
-  setTimeout(function(){
-    bubble.textContent = _BUBBLE_MSGS[_bubbleIdx % _BUBBLE_MSGS.length];
-    _bubbleIdx++;
-    bubble.classList.add('shown');
-  }, 350);
-  fab.classList.add('pulse');
-  setTimeout(function(){ fab.classList.remove('pulse'); }, 2500);
-  _widgetPulseTimer = setTimeout(function(){
-    var delay = 8000 + Math.floor(Math.random() * 6000);
-    _widgetPulseTimer = setTimeout(pulseWidget, delay);
-  }, 3000);
-}
-// Kick off widget pulse on load
-setTimeout(function(){ pulseWidget(); }, 1200);
-
-/* ── Chat scripted conversation ─────────────────────────────── */
-// DEMO SIMULATION — messages are scripted, no real AI or backend calls.
-var SCRIPT = [
-  { delay: 0,    type:'ava',  text:'👋 Hi! I\'m Ava, Blue Ridge Roofing\'s 24/7 assistant. Are you dealing with a roof emergency?' },
-  { delay: 1200, type:'actions', options:['🚨 Emergency Roof Leak','🔍 Get a Free Estimate','📅 Schedule an Inspection'] },
-  { delay: 4000, type:'user-pick', pick: 0, text:'🚨 Emergency Roof Leak' },
-  { delay: 5400, type:'ava',  text:'I\'m on it. Is water currently entering your home?' },
-  { delay: 9200, type:'user', text:'Yes — there\'s water coming through the ceiling in two rooms.' },
-  { delay:10600, type:'ava',  text:'That\'s a priority situation. I\'m alerting the team now. Can I get your name?' },
-  { delay:14400, type:'user', text:'Sarah Miller' },
-  { delay:15700, type:'ava',  text:'Thanks Sarah. What\'s the property address?' },
-  { delay:19400, type:'user', text:'847 Elm Ridge Road, Waynesboro' },
-  { delay:20800, type:'ava',  text:'Got it. And the best number to reach you?' },
-  { delay:24500, type:'user', text:'(540) 771-2284' },
-  { delay:26200, type:'ava',  text:'Perfect. I\'ve alerted the Blue Ridge Roofing team and sent a confirmation by text. Someone will contact you shortly.' }
-];
-
-function startWebChat() {
-  if(_chatStarted) return;
-  _chatStarted = true;
-  if(_widgetPulseTimer) { clearTimeout(_widgetPulseTimer); _widgetPulseTimer = null; }
-  document.getElementById('start-btn').classList.add('hidden-btn');
-  showScreen('s-chat');
-  // Narration starts when chat demo begins — handled by APEX MINI-FILM LAYER below
-  runScript(0);
-}
-
-function runScript(idx) {
-  if(idx >= SCRIPT.length) {
-    // After last message, transition to automation sequence
-    var t = _chatTimers[_chatTimers.length] = setTimeout(function(){
-      showAutoSequence();
-    }, 2400);
-    return;
-  }
-  var item = SCRIPT[idx];
-  var t = setTimeout(function(){
-    if(_paused) {
-      // Poll until unpaused
-      (function wait(){ if(_paused){ setTimeout(wait,200); return; } _execStep(item, idx); })();
-    } else {
-      _execStep(item, idx);
-    }
-  }, item.delay);
-  _chatTimers.push(t);
-}
-
-function _execStep(item, idx) {
-  var area = document.getElementById('messages-area');
-  if(!area) return;
-
-  if(item.type === 'ava') {
-    showTyping(area, function(){
-      var msg = createMsg('from-ava', item.text, 'Ava');
-      area.appendChild(msg);
-      scrollChat(area);
-      setTimeout(function(){ msg.classList.add('visible'); }, 30);
-      runScript(idx + 1);
-    });
-    return;
-  }
-
-  if(item.type === 'actions') {
-    var wrap = document.createElement('div');
-    wrap.className = 'chat-actions';
-    item.options.forEach(function(opt, i){
-      var btn = document.createElement('button');
-      btn.className = 'chat-action-btn';
-      btn.textContent = opt;
-      btn.onclick = function(){};  // handled by user-pick step
-      wrap.appendChild(btn);
-    });
-    area.appendChild(wrap);
-    scrollChat(area);
-    setTimeout(function(){ wrap.classList.add('visible'); }, 30);
-    // Next step is user-pick which fires after its delay
-    runScript(idx + 1);
-    return;
-  }
-
-  if(item.type === 'user-pick') {
-    // Visually select the picked option
-    var actions = area.querySelectorAll('.chat-actions');
-    var lastActions = actions[actions.length - 1];
-    if(lastActions) {
-      var btns = lastActions.querySelectorAll('.chat-action-btn');
-      if(btns[item.pick]) btns[item.pick].classList.add('selected');
-    }
-    // Update input bar placeholder to show "typing"
-    var placeholder = document.getElementById('chat-input-placeholder');
-    if(placeholder) placeholder.textContent = item.text;
-    setTimeout(function(){
-      // Create user message
-      var msg = createMsg('from-user', item.text, '');
-      area.appendChild(msg);
-      scrollChat(area);
-      setTimeout(function(){ msg.classList.add('visible'); }, 30);
-      if(placeholder) placeholder.textContent = 'Type a message…';
-      runScript(idx + 1);
-    }, 600);
-    return;
-  }
-
-  if(item.type === 'user') {
-    var placeholder = document.getElementById('chat-input-placeholder');
-    // Simulate typing in input
-    if(placeholder) placeholder.textContent = item.text;
-    setTimeout(function(){
-      var msg = createMsg('from-user', item.text, '');
-      area.appendChild(msg);
-      scrollChat(area);
-      setTimeout(function(){ msg.classList.add('visible'); }, 30);
-      if(placeholder) placeholder.textContent = 'Type a message…';
-      runScript(idx + 1);
-    }, 700);
-    return;
-  }
-
-  runScript(idx + 1);
-}
-
-var _typingEl = null;
-function showTyping(area, cb) {
-  if(_typingEl) { try{ area.removeChild(_typingEl); }catch(e){} }
-  _typingEl = document.createElement('div');
-  _typingEl.className = 'typing-indicator';
-  _typingEl.innerHTML = '<i></i><i></i><i></i>';
-  area.appendChild(_typingEl);
-  scrollChat(area);
-  setTimeout(function(){ _typingEl.classList.add('visible'); }, 30);
-  var delay = 900 + Math.floor(Math.random() * 400);
-  setTimeout(function(){
-    _typingEl.classList.remove('visible');
-    setTimeout(function(){
-      if(_typingEl && _typingEl.parentNode) _typingEl.parentNode.removeChild(_typingEl);
-      _typingEl = null;
-      cb();
-    }, 200);
-  }, delay);
-}
-
-function createMsg(cls, text, sender) {
-  var wrap = document.createElement('div');
-  wrap.className = 'chat-msg ' + cls;
-  if(sender) {
-    var sEl = document.createElement('div');
-    sEl.className = 'msg-sender'; sEl.textContent = sender;
-    wrap.appendChild(sEl);
-  }
-  var bubble = document.createElement('div');
-  bubble.className = 'msg-bubble'; bubble.textContent = text;
-  wrap.appendChild(bubble);
-  return wrap;
-}
-
-function scrollChat(area) {
-  setTimeout(function(){ area.scrollTop = area.scrollHeight; }, 50);
-}
-
-/* ── Automation sequence ─────────────────────────────────────── */
-function showAutoSequence() {
-  if(_autoFired) return;
-  _autoFired = true;
-  showScreen('s-auto');
-  var steps = document.querySelectorAll('.auto-step');
-  steps.forEach(function(step, i){
-    setTimeout(function(){
-      step.classList.add('visible');
-      setTimeout(function(){
-        step.classList.add('done');
-        step.querySelector('.step-check').textContent = '✓';
-        if(i === steps.length - 1) {
-          // All steps done — go to summary
-          setTimeout(function(){ showScreen('s-summary'); onComplete(); }, 1200);
-        }
-      }, 450);
-    }, i * 500);
-  });
-}
-
-/* ── Summary reveal (camera-pan) ────────────────────────────── */
-var REVEAL_GROUPS = [
-  '#s-summary .rr-card',
-  '#s-summary .stats-row',
-  '#s-summary .contact-card',
-  '#s-summary .pipeline-wrap',
-  '#s-summary .recovery-divider',
-  '#s-summary .recovery-card',
-  '#s-summary .cta-card'
-];
-var REVEAL_SEL = REVEAL_GROUPS.join(',');
-
-// Permanently disable rr-in animation on summary cards (ID+class specificity beats .rr-card alone)
-(function(){
-  var st = document.createElement('style');
-  st.textContent =
-    '#s-summary .rr-card,#s-summary .stats-row,#s-summary .contact-card,' +
-    '#s-summary .pipeline-wrap,#s-summary .recovery-divider,' +
-    '#s-summary .recovery-card,#s-summary .cta-card{animation:none;}';
-  document.head.appendChild(st);
-})();
-
-function preHideResult() {
-  document.querySelectorAll(REVEAL_SEL).forEach(function(el){
-    el.classList.remove('apex-cpan-in');
-    el.classList.add('apex-cpan-pre');
-  });
-}
-function clearReveal() {
-  document.querySelectorAll(REVEAL_SEL).forEach(function(el){
-    el.classList.remove('apex-cpan-pre','apex-cpan-in');
-  });
-}
-function revealCards() {
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  setTimeout(function(){
-    REVEAL_GROUPS.forEach(function(sel, g){
-      setTimeout(function(){
-        document.querySelectorAll(sel).forEach(function(el){
-          requestAnimationFrame(function(){ requestAnimationFrame(function(){
-            el.classList.remove('apex-cpan-pre');
-            el.classList.add('apex-cpan-in');
-          }); });
-        });
-        // Animate revenue counter on recovery-card reveal
-        if(g === 5) animateRevenue();
-      }, g * 380);
-    });
-    // Show continue after last group
-    setTimeout(function(){ showContinue(); }, REVEAL_GROUPS.length * 380 + 600);
-  }, 700);
-}
-
-function animateRevenue() {
-  var el = document.getElementById('revenue-counter');
-  var bar = document.getElementById('recovery-bar');
-  if(!el) return;
-  var target = 18400;
-  var start = Date.now();
-  var dur = 1500;
-  if(bar) setTimeout(function(){ bar.style.width = '73%'; }, 100);
-  (function tick(){
-    var pct = Math.min((Date.now()-start)/dur, 1);
-    var eased = 1 - Math.pow(1-pct, 3);
-    el.textContent = '$' + Math.round(eased * target).toLocaleString();
-    if(pct < 1) requestAnimationFrame(tick);
-  })();
-}
-
-function onComplete() {
-  preHideResult();
-  revealCards();
-  // Ava widget minimizes from the page (visual cue — handled in CSS)
-}
-
-/* ── Continue button ─────────────────────────────────────────── */
-function ensureContinue() {
-  if(document.getElementById('apex-mf-continue-wrap')) return;
-  var wrap = document.createElement('div');
-  wrap.id = 'apex-mf-continue-wrap'; wrap.className = 'apex-mf-continue-wrap';
-  var btn = document.createElement('button');
-  btn.type = 'button'; btn.className = 'apex-mf-continue';
-  btn.innerHTML = 'Continue to Speed-to-Lead →';
-  btn.onclick = function(){ apexContinue('speed-to-lead'); };
-  wrap.appendChild(btn);
-  var host = document.getElementById('summary-inner') || document.getElementById('s-summary') || document.body;
-  host.appendChild(wrap);
-}
-function showContinue() { ensureContinue(); document.getElementById('apex-mf-continue-wrap').classList.add('is-on'); }
-function hideContinue() { var w = document.getElementById('apex-mf-continue-wrap'); if(w) w.classList.remove('is-on'); }
-function apexContinue(target) {
-  stopNar();
-  try{ window.parent.postMessage({ type:'apex-chapter-continue', target: target }, '*'); }catch(e){}
-  try{ window.top.location.hash = target; }catch(e){}
-  try{ window.parent.location.hash = target; }catch(e){}
-  try{ var el=document.getElementById(target); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
-}
-</script>
-
-<!-- ============================================================
-     APEX MINI-FILM LAYER — IIFE
-     Manages Jon narration lifecycle for the Website Receptionist chapter.
-     DEMO SIMULATION — narration only, no real backend calls.
-     ============================================================ -->
+<!-- ══════════════════════════════════════════════════
+     APEX MINI-FILM LAYER
+     DEMO / SIMULATION MODE — no real SMS sent,
+     no real calls placed, no real data stored.
+════════════════════════════════════════════════════ -->
 <script>
 (function(){
+  'use strict';
+
+  /* ── Config ─────────────────────────────────────────────── */
   var CFG = {
-    narSrc:       'https://shodkay87.github.io/apex-narration/websitechat.mp3',
-    startFn:      'startWebChat',
-    startBtnSel:  '#start-btn',
-    summaryId:    's-summary',
-    introScreenId:'s-intro'
+    narSrc:    'https://shodkay87.github.io/apex-narration/websitechat.mp3',
+    summaryId: 's-summary',
+    autoId:    's-auto',
+    mainId:    's-main'
   };
 
-  /* Audio */
-  var audio = new Audio();
-  audio.preload = 'none';
-  var _narPlaying = false;
+  /* ── Camera-pan CSS (kills rr-in animation, applies pan classes) */
+  (function(){
+    var st = document.createElement('style');
+    st.textContent =
+      '#s-summary .rr-card,#s-summary .stats-row{animation:none!important;}' +
+      '.apex-cpan-pre{opacity:0!important;transform:translateY(38px)!important;transition:none!important;}' +
+      '.apex-cpan-in{opacity:1!important;transform:translateY(0)!important;' +
+        'transition:opacity 0.75s cubic-bezier(0.16,1,0.3,1),transform 0.75s cubic-bezier(0.16,1,0.3,1)!important;}';
+    document.head.appendChild(st);
+  })();
 
-  var pill = document.getElementById('apex-mf-pill');
-  function showPill(){ if(pill) pill.classList.add('is-on'); }
-  function hidePill(){ if(pill) pill.classList.remove('is-on'); }
+  /* ── DOM refs ───────────────────────────────────────────── */
+  var msgEl   = document.getElementById('ava-msgs');
+  var panel   = document.getElementById('ava-panel');
+  var fab     = document.getElementById('ava-fab');
+  var startBtn = document.getElementById('start-btn');
+  var contBtn  = document.getElementById('continue-btn');
 
-  function playSeg(src) {
-    return new Promise(function(resolve){
-      try{
-        audio.pause(); audio.src = src; audio.currentTime = 0;
-        audio.onended = function(){ _narPlaying=false; hidePill(); resolve(); };
-        audio.onerror = function(){ _narPlaying=false; hidePill(); resolve(); };
-        var p = audio.play();
-        if(p && p.catch) p.catch(function(){ _narPlaying=false; hidePill(); resolve(); });
-        _narPlaying = true; showPill();
-      }catch(e){ _narPlaying=false; hidePill(); resolve(); }
+  /* ── State ───────────────────────────────────────────────── */
+  var nar       = null;
+  var _started  = false;
+  var _timers   = [];
+
+  /* ── Helpers ─────────────────────────────────────────────── */
+  function st(fn, ms){ var id = setTimeout(fn, ms); _timers.push(id); return id; }
+
+  function flash(cb){
+    var f = document.getElementById('flash');
+    f.classList.add('on');
+    setTimeout(function(){ f.classList.remove('on'); cb && cb(); }, 200);
+  }
+
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    flash(function(){
+      var el = document.getElementById(id);
+      if(el) el.classList.add('active');
     });
   }
 
-  window.stopNar = function(){
-    try{ audio.pause(); audio.src=''; }catch(e){}
-    _narPlaying=false; hidePill();
-  };
+  /* ── Chat helpers ────────────────────────────────────────── */
+  function addTyping(){
+    var d = document.createElement('div');
+    d.id = '_ty'; d.className = 'msg-ava';
+    d.innerHTML = '<div class="typing-ind"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+    msgEl.appendChild(d); msgEl.scrollTop = msgEl.scrollHeight;
+  }
+  function removeTyping(){ var t = document.getElementById('_ty'); if(t) t.parentNode.removeChild(t); }
 
-  /* Wrap startWebChat to play narration first */
-  var origStart = window[CFG.startFn];
-  function wrappedStart(){
-    stopNar();
-    // Hide start button immediately
-    if(CFG.startBtnSel){
-      document.querySelectorAll(CFG.startBtnSel).forEach(function(b){ b.style.display='none'; });
+  function addMsg(cls, text, delay){
+    st(function(){
+      removeTyping();
+      var d = document.createElement('div');
+      d.className = cls;
+      var b = document.createElement('div'); b.className = 'msg-bubble'; b.textContent = text;
+      d.appendChild(b); msgEl.appendChild(d); msgEl.scrollTop = msgEl.scrollHeight;
+    }, delay);
+  }
+
+  function addActions(delay){
+    st(function(){
+      removeTyping();
+      var wrap = document.createElement('div'); wrap.className = 'quick-actions'; wrap.id = 'qa-wrap';
+      ['🚨 Emergency Roof Leak','🔍 Free Estimate','📅 Schedule Inspection'].forEach(function(lbl){
+        var b = document.createElement('div'); b.className = 'qa-btn'; b.textContent = lbl;
+        wrap.appendChild(b);
+      });
+      msgEl.appendChild(wrap); msgEl.scrollTop = msgEl.scrollHeight;
+    }, delay);
+  }
+
+  function selectAction(delay){
+    st(function(){
+      var btns = document.querySelectorAll('.qa-btn');
+      if(btns[0]) btns[0].classList.add('selected');
+    }, delay);
+  }
+
+  /* ── Chat script — ~8–9s total
+   * DEMO / SIMULATION MODE. No data is sent or stored.
+   ──────────────────────────────────────────────────── */
+  function runChatScript(){
+    var T = 0;
+
+    /* FAB pulse → open panel */
+    st(function(){ fab.classList.add('pulse'); }, T + 500);
+    st(function(){ panel.classList.add('open'); }, T + 700);
+
+    /* Ava greeting */
+    st(function(){ addTyping(); }, T + 1000);
+    addMsg('msg-ava', "Hi! I'm Ava. How can I help you today?", T + 1600);
+
+    /* Action buttons */
+    addActions(T + 2100);
+
+    /* Visitor selects Emergency Roof Leak */
+    selectAction(T + 2900);
+    addMsg('msg-user', '🚨 Emergency Roof Leak', T + 3400);
+
+    /* Ava asks about water */
+    st(function(){ addTyping(); }, T + 3800);
+    addMsg('msg-ava', "Is water actively entering your home?", T + 4400);
+
+    /* Visitor: Yes */
+    addMsg('msg-user', 'Yes — coming through the ceiling.', T + 5300);
+
+    /* Ava asks for phone */
+    st(function(){ addTyping(); }, T + 5700);
+    addMsg('msg-ava', "I've marked this as urgent. What's the best number to reach you?", T + 6300);
+
+    /* Visitor gives phone */
+    addMsg('msg-user', '(540) 771-2284', T + 7200);
+
+    /* Ava final confirmation */
+    st(function(){ addTyping(); }, T + 7600);
+    addMsg('msg-ava', "Perfect. I've alerted the Blue Ridge Roofing team and sent a confirmation by text. Someone will contact you shortly.", T + 8200);
+
+    /* → automation at T+9.4s */
+    st(function(){ runAuto(); }, T + 9400);
+  }
+
+  /* ── Automation — 4 steps in ~2s ────────────────────────── */
+  var AUTO = [
+    { id:'st-0', delay:200,  done:'Sarah Miller added to CRM' },
+    { id:'st-1', delay:620,  done:'Priority: HIGH — Emergency Response Team' },
+    { id:'st-2', delay:1050, done:'SMS sent to (540) 771-2284' },
+    { id:'st-3', delay:1480, done:'Field crew dispatched — ETA confirmed' }
+  ];
+
+  function runAuto(){
+    showScreen(CFG.autoId);
+    AUTO.forEach(function(s){
+      st(function(){
+        var el = document.getElementById(s.id);
+        if(!el) return;
+        el.style.animation = 'step-in 0.32s ease both';
+        /* after animation settles, mark done */
+        setTimeout(function(){
+          el.classList.add('done');
+          var desc = el.querySelector('.auto-desc');
+          if(desc) desc.textContent = s.done;
+        }, 200);
+      }, s.delay);
+    });
+    st(function(){ showSummary(); }, 2100);
+  }
+
+  /* ── Summary reveal with camera-pan ─────────────────────── */
+  function showSummary(){
+    /* Pre-hide before flash */
+    document.querySelectorAll('.apex-cpan-pre').forEach(function(el){
+      el.classList.remove('apex-cpan-in');
+    });
+
+    showScreen(CFG.summaryId);
+
+    /* Camera-pan in CRM card */
+    st(function(){ document.getElementById('crm-card').classList.add('apex-cpan-in'); }, 340);
+
+    /* Count up $18,400 */
+    st(function(){ countUp(document.getElementById('job-value'), 0, 18400, 1200); }, 500);
+
+    /* Count up stat 0 (response hours: 0) */
+    st(function(){ countUp(document.getElementById('stat-0'), 0, 0, 800); }, 500);
+
+    /* Camera-pan in stats row */
+    st(function(){ document.getElementById('stats-row').classList.add('apex-cpan-in'); }, 560);
+
+    /* Live widget reveal */
+    st(function(){ document.getElementById('live-reveal').classList.add('shown'); }, 1300);
+
+    /* Continue button */
+    st(function(){ contBtn.classList.add('visible'); }, 1900);
+  }
+
+  /* ── Counter animation ───────────────────────────────────── */
+  function countUp(el, from, to, duration){
+    if(!el) return;
+    var start = null;
+    var isCurrency = el.id === 'job-value';
+    function step(ts){
+      if(!start) start = ts;
+      var prog = Math.min((ts - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - prog, 3); /* ease-out cubic */
+      var val = Math.round(from + (to - from) * ease);
+      el.textContent = isCurrency
+        ? '$' + val.toLocaleString()
+        : val.toString();
+      if(prog < 1) requestAnimationFrame(step);
     }
-    // Play narration, then start chat
-    playSeg(CFG.narSrc).then(function(){
-      /* narration finished — chat is already running; this is a no-op */
-    });
-    // Start chat sequence in parallel with narration (narration accompanies the chat)
-    if(typeof origStart === 'function') origStart();
+    requestAnimationFrame(step);
   }
-  if(typeof origStart === 'function') window[CFG.startFn] = wrappedStart;
 
-  /* Wrap togglePause to sync narration audio */
-  var _origToggle = window.togglePause;
-  window.togglePause = function(){
-    var narPlaying = !!audio.src && !audio.paused;
-    if(typeof _origToggle === 'function') _origToggle.apply(this, arguments);
-    if(narPlaying){ try{ audio.pause(); }catch(e){} }
-    else if(audio.src && audio.paused && _narPlaying){ try{ audio.play().catch(function(){}); }catch(e){} }
-  };
+  /* ── Continue / postMessage ──────────────────────────────── */
+  contBtn.addEventListener('click', function(){
+    try{ parent.postMessage({ type:'apex-chapter-continue', target:'speed-to-lead' }, '*'); }
+    catch(e){}
+  });
+
+  /* ── Narration ───────────────────────────────────────────── */
+  function setupNarration(){
+    nar = new Audio(CFG.narSrc);
+    nar.preload = 'auto';
+    nar.volume  = 1;
+    nar.addEventListener('ended', function(){ runChatScript(); });
+    nar.addEventListener('error', function(){
+      /* Fallback: run chat if audio fails (404, network, blocked) */
+      setTimeout(runChatScript, 600);
+    });
+  }
+
+  function startDemo(){
+    if(_started) return;
+    _started = true;
+
+    startBtn.style.display = 'none';
+
+    if(nar){
+      var p = nar.play();
+      if(p !== undefined){
+        p.catch(function(){
+          /* Autoplay blocked — proceed directly */
+          setTimeout(runChatScript, 600);
+        });
+      }
+    } else {
+      setTimeout(runChatScript, 600);
+    }
+  }
+
+  /* ── Pause / resume from parent ─────────────────────────── */
+  window.addEventListener('message', function(e){
+    if(!e.data) return;
+    if(e.data.type === 'apex-pause' && nar && !nar.paused) nar.pause();
+    if(e.data.type === 'apex-resume' && nar && nar.paused && _started) nar.play().catch(function(){});
+  });
+
+  /* ── Reduced motion guard ────────────────────────────────── */
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    var injStyle = document.createElement('style');
+    injStyle.textContent = '*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}';
+    document.head.appendChild(injStyle);
+  }
+
+  /* ── Init ───────────────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', function(){
+    setupNarration();
+    startBtn.classList.add('visible');
+    startBtn.addEventListener('click', startDemo);
+  });
 
 })();
 </script>
