@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Apex AI Systems — Website Receptionist</title>
+  <!-- RC3: 2-screen cinematic, card <5s after narration, phone typewriter, no chat bubbles -->
   <style>
     :root {
       --bg:         #04081a;
-      --card:       rgba(255,255,255,0.032);
       --border:     rgba(255,255,255,0.07);
       --border-mid: rgba(255,255,255,0.11);
       --border-hi:  rgba(255,255,255,0.18);
@@ -22,10 +22,6 @@
       --green-dim:  rgba(34,197,94,0.13);
       --amber:      #f59e0b;
       --amber-hi:   #fcd34d;
-      --amber-dim:  rgba(245,158,11,0.13);
-      --purple:     #8b5cf6;
-      --purple-hi:  #c4b5fd;
-      --purple-dim: rgba(139,92,246,0.13);
       --text:       #f1f5f9;
       --text-2:     #cbd5e1;
       --text-muted: #64748b;
@@ -43,502 +39,468 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Screens ─────────────────────────────────────────────── */
+    /* ── Screens ───────────────────────────────────────────── */
     .screen {
       position: absolute; inset: 0;
       display: flex; flex-direction: column;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.45s ease;
     }
     .screen.active { opacity: 1; pointer-events: all; }
 
-    /* ── Flash overlay ───────────────────────────────────────── */
     #flash {
-      position: fixed; inset: 0; z-index: 999;
+      position: fixed; inset: 0; z-index: 9999;
       background: radial-gradient(ellipse at 50% 40%, rgba(59,130,246,0.28) 0%, transparent 65%);
       opacity: 0; pointer-events: none;
       transition: opacity 0.18s ease;
     }
     #flash.on { opacity: 1; }
 
-    /* ── Animations ──────────────────────────────────────────── */
+    /* ── Keyframes ─────────────────────────────────────────── */
     @keyframes pulse-dot {
       0%,100%{ opacity:1; transform:scale(1); }
-      50%{ opacity:0.5; transform:scale(0.75); }
+      50%{ opacity:0.45; transform:scale(0.72); }
     }
     @keyframes widget-pulse {
-      0%{ box-shadow: 0 0 0 0 rgba(59,130,246,0.65); }
-      70%{ box-shadow: 0 0 0 12px rgba(59,130,246,0); }
-      100%{ box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+      0%{ box-shadow:0 0 0 0 rgba(59,130,246,0.65); }
+      70%{ box-shadow:0 0 0 12px rgba(59,130,246,0); }
+      100%{ box-shadow:0 0 0 0 rgba(59,130,246,0); }
     }
     @keyframes widget-bounce {
       0%,100%{ transform:scale(1); }
-      40%{ transform:scale(1.10); }
-      60%{ transform:scale(0.96); }
-      80%{ transform:scale(1.03); }
+      40%{ transform:scale(1.09); }
+      70%{ transform:scale(0.97); }
     }
-    @keyframes msg-in {
-      from{ opacity:0; transform:translateY(7px); }
+    @keyframes fade-up {
+      from{ opacity:0; transform:translateY(8px); }
       to{ opacity:1; transform:translateY(0); }
     }
-    @keyframes typing-dot {
-      0%,80%,100%{ transform:translateY(0); opacity:0.4; }
-      40%{ transform:translateY(-4px); opacity:1; }
-    }
-    @keyframes step-in {
-      from{ opacity:0; transform:translateX(-12px); }
+    @keyframes slide-in-x {
+      from{ opacity:0; transform:translateX(-10px); }
       to{ opacity:1; transform:translateX(0); }
     }
-    @keyframes rr-in {
-      from{ opacity:0; transform:translateY(14px); }
-      to{ opacity:1; transform:translateY(0); }
+    @keyframes check-pop {
+      from{ opacity:0; transform:scale(0.5); }
+      to{ opacity:1; transform:scale(1); }
     }
-    @keyframes live-pulse {
-      0%,100%{ opacity:1; }
-      50%{ opacity:0.4; }
+    @keyframes cursor-blink {
+      0%,49%{ opacity:1; } 50%,100%{ opacity:0; }
     }
     @keyframes apexEq {
-      0%,100%{ height:4px; }
-      50%{ height:13px; }
+      0%,100%{ height:4px; } 50%{ height:12px; }
     }
-    @keyframes panel-open {
-      from{ opacity:0; transform:translateY(10px) scale(0.97); }
-      to{ opacity:1; transform:translateY(0) scale(1); }
+    /* camera-pan for CRM card */
+    @keyframes cpan-in {
+      from{ opacity:0; transform:translateY(36px); }
+      to{ opacity:1; transform:translateY(0); }
     }
 
-    /* ── Global header ───────────────────────────────────────── */
-    .global-header {
+    /* ── Global header ──────────────────────────────────────── */
+    .hdr {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 24px;
+      padding: 12px 24px;
       border-bottom: 1px solid var(--border);
-      background: rgba(4,8,26,0.80);
-      backdrop-filter: blur(12px);
-      flex-shrink: 0; z-index: 10;
+      background: rgba(4,8,26,0.85); backdrop-filter: blur(14px);
+      flex-shrink: 0; z-index: 50;
     }
     .apex-brand { display: flex; align-items: center; gap: 9px; }
     .apex-mark {
       width: 30px; height: 30px; border-radius: 8px;
       background: linear-gradient(140deg, #4f96ff, #2563eb);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 14px; color: #fff;
+      font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0;
     }
-    .apex-brand-text { font-size: 13px; font-weight: 700; color: var(--text); }
-    .apex-brand-sub  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-    .client-pill {
+    .apex-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .apex-sub  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .hdr-pill {
       display: flex; align-items: center; gap: 7px;
       padding: 4px 12px; border-radius: 20px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
       font-size: 11px; color: var(--text-2);
     }
-    .status-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); animation: pulse-dot 2s infinite;
-    }
-    .nar-bar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 5px 12px; border-radius: 20px;
-      background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.22);
-      font-size: 11px; color: var(--blue-hi);
-    }
-    .apex-eq {
-      display: inline-flex; align-items: flex-end; gap: 2px; height: 14px;
-    }
-    .apex-eq span {
-      display: inline-block; width: 3px; background: var(--blue-hi);
-      border-radius: 2px; height: 4px;
-      animation: apexEq 0.7s ease infinite;
-    }
-    .apex-eq span:nth-child(2){ animation-delay:0.15s; height:8px; }
-    .apex-eq span:nth-child(3){ animation-delay:0.30s; }
-    .apex-eq span:nth-child(4){ animation-delay:0.10s; height:6px; }
+    .hdr-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse-dot 2s infinite; }
 
-    /* ══════════════════════════════════════════════════
-       SCREEN 1 — Desktop browser scene
-    ══════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════
+       SCREEN 1 — s-main
+       Desktop browser showing Blue Ridge Roofing website
+    ═══════════════════════════════════════════════════ */
     #s-main {
       background:
-        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(59,130,246,0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 65% 50% at 50% 0%, rgba(59,130,246,0.10) 0%, transparent 65%),
         linear-gradient(180deg, #060c24 0%, #04081a 100%);
     }
     .main-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 16px 24px 12px;
-      min-height: 0;
+      padding: 14px 22px 10px; min-height: 0;
     }
-    /* Browser chrome + viewport fill the available space */
-    .browser-wrap {
-      width: 100%; max-width: 860px;
-      flex: 1; display: flex; flex-direction: column;
-      min-height: 0;
+    /* The browser window — takes up most of the scene */
+    .browser-win {
+      width: 100%; max-width: 880px;
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      border-radius: 13px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.07),
+        0 24px 80px rgba(0,0,0,0.60),
+        0 4px 20px rgba(0,0,0,0.35);
     }
-    .browser-chrome {
-      background: #1b2236;
-      border: 1px solid var(--border-mid);
-      border-bottom: none;
-      border-radius: 12px 12px 0 0;
-      padding: 9px 14px;
-      display: flex; align-items: center; gap: 7px;
+    /* Chrome bar */
+    .b-chrome {
+      background: #1c2236; border: 1px solid var(--border-mid);
+      border-bottom: 2px solid rgba(255,255,255,0.05);
+      border-radius: 13px 13px 0 0;
+      padding: 9px 14px; display: flex; align-items: center; gap: 8px;
       flex-shrink: 0;
     }
-    .bdot { width: 11px; height: 11px; border-radius: 50%; }
-    .bdot-r { background: #ef4444; }
-    .bdot-y { background: #f59e0b; }
-    .bdot-g { background: #22c55e; }
-    .b-url-bar {
-      flex: 1; margin-left: 8px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 12px;
+    .bd { width: 11px; height: 11px; border-radius: 50%; }
+    .bd:nth-child(1){ background: #f05252; }
+    .bd:nth-child(2){ background: #e9a826; }
+    .bd:nth-child(3){ background: #33c95e; }
+    .b-url {
+      flex: 1; margin: 0 8px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 6px; padding: 5px 12px;
       font-size: 11.5px; color: var(--text-muted);
       display: flex; align-items: center; gap: 6px;
     }
-    .b-lock { font-size: 10px; color: #4ade80; }
-    .browser-viewport {
+    .b-lock { color: #4ade80; font-size: 10px; }
+    /* Viewport: the Blue Ridge website */
+    .b-viewport {
       flex: 1; min-height: 0;
-      border: 1px solid var(--border-mid);
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-      background: #0c1329;
-      position: relative; overflow: hidden;
+      border: 1px solid var(--border-mid); border-top: none;
+      border-radius: 0 0 13px 13px;
+      background: #091120; overflow: hidden; position: relative;
     }
+    .site-wrap { height: 100%; display: flex; flex-direction: column; }
 
-    /* Blue Ridge website inside viewport */
-    .site-content { height: 100%; display: flex; flex-direction: column; }
-    .site-nav {
-      padding: 12px 22px; display: flex; align-items: center; justify-content: space-between;
-      background: #0a1020; border-bottom: 1px solid rgba(255,255,255,0.05);
+    /* Site nav */
+    .s-nav {
+      padding: 11px 22px; display: flex; align-items: center; justify-content: space-between;
+      background: #07101f; border-bottom: 1px solid rgba(255,255,255,0.06);
       flex-shrink: 0;
     }
-    .site-logo { display: flex; align-items: center; gap: 9px; }
-    .site-logo-mark {
+    .s-logo { display: flex; align-items: center; gap: 9px; }
+    .s-logo-icon {
       width: 34px; height: 34px; border-radius: 8px;
-      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
     }
-    .site-logo-name { font-size: 13px; font-weight: 800; color: #e2e8f0; line-height: 1.15; }
-    .site-logo-sub  { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; }
-    .site-nav-links { display: flex; gap: 22px; }
-    .site-nav-link { font-size: 12px; color: #64748b; }
-    .site-nav-cta {
-      padding: 6px 16px; border-radius: 7px;
-      background: linear-gradient(135deg, #1d4ed8, #2563eb);
-      color: #fff; font-size: 11.5px; font-weight: 700;
+    .s-logo-name { font-size: 13px; font-weight: 800; color: #e2e8f0; }
+    .s-logo-sub  { font-size: 9px; color: #475569; text-transform: uppercase; letter-spacing: 0.08em; }
+    .s-nav-links { display: flex; gap: 20px; align-items: center; }
+    .s-nav-link  { font-size: 12px; color: #475569; }
+    .s-nav-phone { font-size: 12px; font-weight: 600; color: var(--blue-hi); }
+    .s-nav-cta   {
+      padding: 6px 16px; border-radius: 7px; font-size: 12px; font-weight: 700;
+      background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff;
     }
-    .site-hero {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 18px 24px; gap: 13px; position: relative;
+
+    /* Site hero — looks like a real roofing website */
+    .s-hero {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 13px; padding: 18px 24px; position: relative; overflow: hidden;
+      background: linear-gradient(160deg, #071428 0%, #0c1e3a 50%, #081020 100%);
     }
-    .site-eyebrow {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
-      color: #60a5fa; padding: 3px 10px; border-radius: 20px;
-      background: rgba(59,130,246,0.11); border: 1px solid rgba(59,130,246,0.2);
+    .s-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 90% 55% at 50% -10%, rgba(59,130,246,0.14) 0%, transparent 60%);
+      pointer-events: none;
     }
-    .site-h1 {
-      font-size: clamp(16px, 2.6vw, 26px); font-weight: 800;
+    /* Fake background shingle grid for realism */
+    .s-hero::after {
+      content: '';
+      position: absolute; inset: 0; opacity: 0.04;
+      background: repeating-linear-gradient(
+        110deg,
+        #60a5fa 0px, #60a5fa 1px, transparent 1px, transparent 48px
+      );
+      pointer-events: none;
+    }
+    .s-stars {
+      font-size: 12px; color: #fbbf24; letter-spacing: 2px; position: relative; z-index: 1;
+    }
+    .s-rating-line {
+      font-size: 10px; color: #64748b; margin-top: 2px; position: relative; z-index: 1;
+    }
+    .s-h1 {
+      font-size: clamp(16px, 2.8vw, 28px); font-weight: 800;
       color: #f1f5f9; text-align: center; line-height: 1.2;
+      position: relative; z-index: 1;
     }
-    .site-h1 em { color: #60a5fa; font-style: normal; }
-    .site-sub {
+    .s-h1 em { color: #60a5fa; font-style: normal; }
+    .s-sub {
       font-size: 12px; color: #64748b; text-align: center;
-      max-width: 360px; line-height: 1.55;
+      max-width: 360px; line-height: 1.55; position: relative; z-index: 1;
     }
-    .site-cta-row { display: flex; gap: 10px; margin-top: 2px; }
-    .site-btn-primary {
-      padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 700;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; cursor: default;
+    .s-cta-row { display: flex; gap: 10px; position: relative; z-index: 1; }
+    .s-btn-red {
+      padding: 9px 22px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; cursor: default;
     }
-    .site-btn-outline {
-      padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    .s-btn-ghost {
+      padding: 9px 20px; border-radius: 8px; font-size: 12px; font-weight: 600;
       background: transparent; color: #475569;
       border: 1px solid rgba(255,255,255,0.10); cursor: default;
     }
-    /* Trust badges row */
-    .site-trust {
-      display: flex; gap: 16px; margin-top: 4px;
+    .s-trust-row {
+      display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+      position: relative; z-index: 1;
     }
-    .trust-item { font-size: 10px; color: #475569; display: flex; align-items: center; gap: 4px; }
-    .trust-item span { color: #4ade80; }
+    .s-trust-item { font-size: 10px; color: #334155; display: flex; align-items: center; gap: 4px; }
+    .s-trust-item span { color: #22c55e; }
 
-    /* Ava chat widget in lower-right of browser viewport */
-    .ava-widget-wrap {
+    /* ── Ava Chat Widget ─────────────────────────────────────
+       Positioned bottom-right of the browser viewport.
+       Uses pre-built STATE machine — no dynamic DOM appending.
+       This looks like Intercom/Drift/HubSpot, NOT iMessage.
+    ─────────────────────────────────────────────────────── */
+    .ava-wrap {
       position: absolute; bottom: 14px; right: 14px;
       display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
-      z-index: 20;
+      z-index: 40;
     }
-    .ava-chat-panel {
-      width: 260px;
-      background: rgba(7,12,32,0.98);
-      border: 1px solid rgba(59,130,246,0.26);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(59,130,246,0.08);
-      display: none;
-      flex-direction: column;
-      max-height: 290px;
-      animation: panel-open 0.35s cubic-bezier(0.16,1,0.3,1) both;
+    .ava-panel {
+      width: 248px;
+      background: rgba(5,9,28,0.98);
+      border: 1px solid rgba(59,130,246,0.22);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.70), 0 0 0 1px rgba(255,255,255,0.04);
+      display: none; flex-direction: column;
     }
-    .ava-chat-panel.open { display: flex; }
-    .ava-panel-header {
+    .ava-panel.open {
+      display: flex;
+      animation: fade-up 0.32s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    /* Panel header */
+    .ava-ph {
       padding: 10px 13px; display: flex; align-items: center; gap: 9px;
-      background: rgba(59,130,246,0.10); border-bottom: 1px solid rgba(59,130,246,0.16);
+      background: rgba(59,130,246,0.09); border-bottom: 1px solid rgba(59,130,246,0.14);
       flex-shrink: 0;
     }
-    .ava-avatar-sm {
-      width: 30px; height: 30px; border-radius: 50%;
+    .ava-av {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
     }
-    .ava-panel-name { font-size: 12px; font-weight: 700; color: #f1f5f9; }
-    .ava-panel-status { font-size: 10px; color: var(--green-hi); display: flex; align-items: center; gap: 4px; }
-    .ava-panel-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
-    .ava-messages {
-      flex: 1; overflow-y: auto; padding: 10px 9px; display: flex; flex-direction: column; gap: 7px;
-      scrollbar-width: none; min-height: 0;
-    }
-    .ava-messages::-webkit-scrollbar { display: none; }
-    .msg-bubble {
-      padding: 7px 10px; border-radius: 10px;
-      font-size: 11px; line-height: 1.45; max-width: 88%;
-      animation: msg-in 0.28s ease both;
-    }
-    .msg-ava .msg-bubble {
-      background: rgba(59,130,246,0.13); border: 1px solid rgba(59,130,246,0.20);
-      color: #e2e8f0; align-self: flex-start; border-radius: 4px 10px 10px 10px;
-    }
-    .msg-user .msg-bubble {
-      background: rgba(59,130,246,0.26); border: 1px solid rgba(59,130,246,0.38);
-      color: #f1f5f9; align-self: flex-end; border-radius: 10px 4px 10px 10px;
-    }
-    .msg-ava, .msg-user { display: flex; flex-direction: column; }
-    .quick-actions { display: flex; flex-direction: column; gap: 4px; animation: msg-in 0.28s ease both; }
-    .qa-btn {
-      padding: 6px 10px; border-radius: 7px;
+    .ava-ph-name   { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+    .ava-ph-status { font-size: 10px; color: var(--green-hi); display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+    .ava-ph-dot    { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
+    /* Panel body: contains all 3 states */
+    .ava-body { padding: 12px; display: flex; flex-direction: column; gap: 0; }
+
+    /* Widget state base — hidden by default */
+    .ws { display: none; flex-direction: column; gap: 7px; }
+    .ws.active { display: flex; animation: fade-up 0.28s ease both; }
+
+    /* STATE 1: option buttons (website quick-reply style, NOT chat bubbles) */
+    .ws-how { font-size: 11.5px; font-weight: 600; color: var(--text-2); margin-bottom: 3px; }
+    .ws-opt {
+      padding: 8px 12px; border-radius: 8px;
       background: rgba(255,255,255,0.04); border: 1px solid var(--border-mid);
-      color: var(--text-muted); font-size: 10.5px; font-weight: 600;
-      cursor: default; text-align: left;
+      color: var(--text-muted); font-size: 11px; font-weight: 600;
+      cursor: default; transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .qa-btn.selected {
-      background: rgba(59,130,246,0.16); border-color: rgba(59,130,246,0.38);
-      color: var(--blue-hi);
+    .ws-opt.sel {
+      background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.32);
+      color: var(--red-hi);
     }
-    .typing-ind {
-      display: flex; align-items: center; gap: 4px;
-      padding: 7px 10px; border-radius: 4px 10px 10px 10px;
-      background: rgba(59,130,246,0.09); border: 1px solid rgba(59,130,246,0.16);
-      width: fit-content;
+
+    /* STATE 2: phone capture */
+    .ws-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      background: rgba(239,68,68,0.11); border: 1px solid rgba(239,68,68,0.26);
+      font-size: 10.5px; font-weight: 700; color: var(--red-hi);
     }
-    .td {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--text-muted); animation: typing-dot 1.2s infinite;
+    .ws-lbl { font-size: 11px; color: var(--text-muted); }
+    .ws-phone-wrap {
+      display: flex; align-items: center;
+      padding: 8px 11px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border-mid);
+      min-height: 36px;
     }
-    .td:nth-child(2){ animation-delay:0.15s; }
-    .td:nth-child(3){ animation-delay:0.30s; }
+    .ws-phone-txt { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+    .ws-cursor {
+      display: inline-block; color: var(--blue); margin-left: 1px;
+      animation: cursor-blink 0.9s step-end infinite;
+    }
+
+    /* STATE 3: confirmation (green success box, like real widget) */
+    .ws-confirm {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 12px; border-radius: 10px;
+      background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.22);
+      animation: fade-up 0.3s ease both;
+    }
+    .ws-ci {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(34,197,94,0.16); border: 1px solid rgba(34,197,94,0.32);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--green-hi);
+    }
+    .ws-ct { font-size: 12px; font-weight: 700; color: var(--green-hi); }
+    .ws-cs { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+
+    /* Ava FAB button */
     .ava-fab {
       width: 46px; height: 46px; border-radius: 50%;
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
       display: flex; align-items: center; justify-content: center;
       font-size: 20px; cursor: default;
-      box-shadow: 0 4px 18px rgba(59,130,246,0.42);
+      box-shadow: 0 4px 16px rgba(59,130,246,0.42);
       position: relative; flex-shrink: 0;
     }
-    .ava-fab.pulse { animation: widget-pulse 1.4s ease 0s 1, widget-bounce 0.55s ease 1.4s 1; }
+    .ava-fab.pulse {
+      animation: widget-pulse 1.3s ease 0s both, widget-bounce 0.5s ease 1.3s both;
+    }
     .ava-fab-dot {
       position: absolute; bottom: 1px; right: 1px;
       width: 12px; height: 12px; border-radius: 50%;
-      background: var(--green); border: 2px solid #0c1329;
+      background: var(--green); border: 2px solid #091120;
       animation: pulse-dot 2s infinite;
     }
 
-    /* ══════════════════════════════════════════════════
-       SCREEN 2 — Automation steps
-    ══════════════════════════════════════════════════ */
-    #s-auto {
-      background:
-        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(59,130,246,0.11) 0%, transparent 65%),
-        linear-gradient(180deg, #060c24 0%, #04081a 100%);
+    /* ── Start button (main screen footer) ────────────────── */
+    .main-foot {
+      padding: 10px 22px 15px; display: flex; justify-content: center; flex-shrink: 0;
     }
-    .auto-body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 20px 28px;
-    }
-    .auto-label {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
-      color: var(--blue-hi); margin-bottom: 18px;
-      display: flex; align-items: center; gap: 7px;
-    }
-    .auto-label-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: pulse-dot 1.2s infinite; }
-    .auto-steps { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 9px; }
-    .auto-step {
-      display: flex; align-items: center; gap: 14px;
-      padding: 13px 17px; border-radius: 12px;
-      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
-      opacity: 0;
-    }
-    .auto-step.done {
-      border-color: rgba(34,197,94,0.22);
-      background: rgba(34,197,94,0.04);
-    }
-    .auto-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0;
-      background: rgba(255,255,255,0.06); border: 1px solid var(--border-mid);
-    }
-    .auto-step.done .auto-icon { background: rgba(34,197,94,0.10); border-color: rgba(34,197,94,0.24); }
-    .auto-text { flex: 1; min-width: 0; }
-    .auto-title { font-size: 13px; font-weight: 700; color: var(--text); }
-    .auto-desc  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .auto-step.done .auto-desc { color: var(--green-hi); }
-    .auto-check {
-      width: 22px; height: 22px; border-radius: 50%;
-      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.32);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; color: var(--green-hi);
-      opacity: 0; transform: scale(0.5);
-      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .auto-step.done .auto-check { opacity: 1; transform: scale(1); }
-
-    /* ══════════════════════════════════════════════════
-       SCREEN 3 — CRM result + live widget
-    ══════════════════════════════════════════════════ */
-    #s-summary {
-      background:
-        radial-gradient(ellipse 60% 45% at 50% 0%, rgba(34,197,94,0.09) 0%, transparent 65%),
-        linear-gradient(180deg, #060c24 0%, #04081a 100%);
-    }
-    .summary-body {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 16px 24px 12px; gap: 12px;
-      position: relative; min-height: 0;
-    }
-
-    /* Camera-pan handled via JS — see .apex-cpan-pre / .apex-cpan-in */
-    .rr-card {
-      width: 100%; max-width: 520px;
-      background: rgba(255,255,255,0.028);
-      border: 1px solid var(--border-mid);
-      border-radius: 16px; overflow: hidden;
-    }
-    .rr-card-header {
-      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
-      background: rgba(34,197,94,0.05); border-bottom: 1px solid var(--border);
-    }
-    .rr-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-    }
-    .rr-contact-info { flex: 1; min-width: 0; }
-    .rr-name { font-size: 15px; font-weight: 700; color: var(--text); }
-    .rr-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .rr-badge {
-      padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700;
-      background: var(--red-dim); border: 1px solid rgba(239,68,68,0.26);
-      color: var(--red-hi); display: flex; align-items: center; gap: 5px;
-      white-space: nowrap;
-    }
-    .rr-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse-dot 1.2s infinite; }
-    .rr-fields { padding: 14px 18px; display: flex; flex-direction: column; gap: 9px; }
-    .rr-field { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-    .rr-field-label { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
-    .rr-field-value { font-size: 12px; font-weight: 600; color: var(--text-2); text-align: right; }
-    .rr-field-value.val-red    { color: var(--red-hi); }
-    .rr-field-value.val-green  { color: var(--green-hi); }
-    .rr-field-value.val-amber  { color: var(--amber-hi); }
-    .rr-field-value.val-check  { color: var(--green-hi); display: flex; align-items: center; gap: 5px; }
-    .rr-field-value.val-check::before { content: '✓'; font-size: 12px; }
-    .rr-divider { height: 1px; background: var(--border); margin: 2px 0; }
-    .rr-value-row {
-      padding: 13px 18px; display: flex; align-items: center; justify-content: space-between;
-      background: rgba(34,197,94,0.045); border-top: 1px solid var(--border);
-    }
-    .rr-value-label  { font-size: 11px; color: var(--text-muted); }
-    .rr-value-amount { font-size: 22px; font-weight: 800; color: var(--green-hi); font-variant-numeric: tabular-nums; }
-
-    /* Stats row */
-    .stats-row {
-      width: 100%; max-width: 520px;
-      display: flex; gap: 10px;
-    }
-    .stat-pill {
-      flex: 1; padding: 11px 14px; border-radius: 11px;
-      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
-      text-align: center;
-    }
-    .stat-pill-val { font-size: 16px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
-    .stat-pill-lab { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-
-    /* Live widget reveal — visual replica in lower-right of summary-body */
-    .live-reveal {
-      position: absolute; bottom: 14px; right: 18px;
-      display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1);
-      pointer-events: none;
-    }
-    .live-reveal.shown { opacity: 1; transform: translateY(0); }
-    .live-badge {
-      display: flex; align-items: center; gap: 5px;
-      padding: 3px 9px; border-radius: 20px;
-      background: rgba(34,197,94,0.14); border: 1px solid rgba(34,197,94,0.28);
-      font-size: 9px; font-weight: 700; color: var(--green-hi);
-      letter-spacing: 0.09em; text-transform: uppercase;
-    }
-    .live-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: live-pulse 1.2s infinite; }
-    /* Pixel-accurate replica of the GHL chat widget launcher button */
-    .live-fab {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; cursor: default;
-      box-shadow: 0 4px 20px rgba(59,130,246,0.45), 0 0 0 2px rgba(59,130,246,0.18);
-      position: relative;
-    }
-    .live-fab-dot {
-      position: absolute; bottom: 2px; right: 2px;
-      width: 13px; height: 13px; border-radius: 50%;
-      background: #22c55e; border: 2px solid #04081a;
-      animation: pulse-dot 2s infinite;
-    }
-
-    /* ── Continue button + footer ─────────────────────────────── */
-    .chapter-footer {
-      padding: 12px 24px 18px;
-      display: flex; justify-content: flex-start;
-      flex-shrink: 0;
-    }
-    /* summary footer: centered but with right margin so widget replica doesn't overlap */
-    #s-summary .chapter-footer {
-      justify-content: center;
-      padding-right: 90px; /* clear the live-reveal widget area (52px fab + 18px offset + padding) */
-    }
-    .continue-btn {
+    .start-btn {
       padding: 12px 36px; border-radius: 12px; border: none; cursor: pointer;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: #fff; font-size: 14px; font-weight: 700;
       box-shadow: 0 6px 24px rgba(59,130,246,0.30);
       opacity: 0; pointer-events: none;
-      transition: opacity 0.4s ease, transform 0.15s ease;
+      transition: opacity 0.35s ease, transform 0.12s ease;
     }
-    .continue-btn.visible { opacity: 1; pointer-events: all; }
-    .continue-btn:hover { transform: scale(1.025); }
+    .start-btn.vis { opacity: 1; pointer-events: all; }
+    .start-btn:hover { transform: scale(1.025); }
 
-    /* Mobile */
+    /* ═══════════════════════════════════════════════════
+       SCREEN 2 — s-result
+       Automation badges (2×2) + CRM card + continue
+    ═══════════════════════════════════════════════════ */
+    #s-result {
+      background:
+        radial-gradient(ellipse 65% 50% at 50% 0%, rgba(34,197,94,0.08) 0%, transparent 65%),
+        linear-gradient(180deg, #060c24 0%, #04081a 100%);
+    }
+    .res-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px 24px 10px; gap: 12px; min-height: 0;
+    }
+
+    /* 4 auto badges in a 2×2 grid — compact, fast cascade */
+    .auto-grid {
+      width: 100%; max-width: 520px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 7px;
+    }
+    .ab {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 13px; border-radius: 10px;
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      opacity: 0;
+    }
+    .ab.done {
+      border-color: rgba(34,197,94,0.22); background: rgba(34,197,94,0.04);
+    }
+    .ab-icon { font-size: 14px; flex-shrink: 0; }
+    .ab-wrap { flex: 1; min-width: 0; }
+    .ab-title { font-size: 11.5px; font-weight: 700; color: var(--text); }
+    .ab-sub   { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
+    .ab.done .ab-sub { color: var(--green-hi); }
+    .ab-ck {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      background: var(--green-dim); border: 1px solid rgba(34,197,94,0.28);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: var(--green-hi);
+      opacity: 0; transform: scale(0.4);
+      transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .ab.done .ab-ck { opacity: 1; transform: scale(1); }
+
+    /* CRM result card */
+    .crm {
+      width: 100%; max-width: 520px;
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border-mid);
+      border-radius: 16px; overflow: hidden;
+      opacity: 0; transform: translateY(34px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .crm.revealed { opacity: 1; transform: translateY(0); }
+    .crm-hd {
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+      background: rgba(34,197,94,0.04); border-bottom: 1px solid var(--border);
+    }
+    .crm-av {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .crm-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .crm-sub  { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+    .crm-badge {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+      background: var(--red-dim); border: 1px solid rgba(239,68,68,0.24);
+      color: var(--red-hi); white-space: nowrap;
+    }
+    .crm-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); animation: pulse-dot 1.2s infinite; }
+    .crm-fields { padding: 13px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .crm-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .crm-lbl { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .crm-val { font-size: 12px; font-weight: 600; color: var(--text-2); text-align: right; }
+    .crm-val.v-red   { color: var(--red-hi); }
+    .crm-val.v-check { color: var(--green-hi); }
+    .crm-val.v-check::before { content: '✓ '; }
+    .crm-div { height: 1px; background: var(--border); margin: 2px 0; }
+    .crm-foot {
+      padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;
+      background: rgba(34,197,94,0.04); border-top: 1px solid var(--border);
+    }
+    .crm-foot-lbl { font-size: 11px; color: var(--text-muted); }
+    .crm-amount    { font-size: 22px; font-weight: 800; color: var(--green-hi); font-variant-numeric: tabular-nums; }
+
+    /* ── Result footer + continue button ───────────────────── */
+    .res-foot {
+      padding: 10px 24px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 520px; align-self: center; flex-shrink: 0;
+    }
+    .live-proof {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 10px; color: var(--text-dim);
+    }
+    .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse-dot 1.5s infinite; }
+    .cont-btn {
+      padding: 12px 36px; border-radius: 12px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff; font-size: 14px; font-weight: 700;
+      box-shadow: 0 6px 24px rgba(59,130,246,0.28);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.12s ease;
+      /* Touch improvements */
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      user-select: none; -webkit-user-select: none;
+    }
+    .cont-btn.vis { opacity: 1; pointer-events: all; }
+    .cont-btn:hover, .cont-btn:active { transform: scale(1.03); }
+
+    /* ── Mobile ────────────────────────────────────────────── */
     @media(max-width:640px){
-      .site-nav-links { display: none; }
-      .ava-chat-panel { width: 220px; }
-      .stats-row { flex-direction: column; }
-      .live-reveal { bottom: 10px; right: 12px; }
-      #s-summary .chapter-footer { padding-right: 75px; }
-      .rr-value-amount { font-size: 18px; }
+      .s-nav-links  { display: none; }
+      .s-trust-row  { display: none; }
+      .s-stars      { font-size: 11px; }
+      .ava-panel    { width: 218px; }
+      .auto-grid    { grid-template-columns: 1fr; }
+      .main-body    { padding: 10px 14px 8px; }
+      .res-body     { padding: 12px 14px 8px; gap: 10px; }
+      .crm-amount   { font-size: 18px; }
+      .res-foot     { padding: 8px 14px 14px; }
     }
   </style>
 </head>
@@ -546,295 +508,279 @@
 
 <div id="flash"></div>
 
-<!-- ══════════════════════════════════════════════════
-     SCREEN 1 — Desktop browser + live chat
-════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 1 — Desktop browser showing Blue Ridge website
+═══════════════════════════════════════════════════════ -->
 <div class="screen active" id="s-main">
-  <header class="global-header">
+  <header class="hdr">
     <div class="apex-brand">
       <div class="apex-mark">A</div>
       <div>
-        <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Website Receptionist</div>
+        <div class="apex-name">Apex AI Systems</div>
+        <div class="apex-sub">Website Receptionist</div>
       </div>
     </div>
-    <div class="client-pill">
-      <div class="status-dot"></div>
-      Blue Ridge Roofing
-    </div>
+    <div class="hdr-pill"><div class="hdr-dot"></div> Blue Ridge Roofing</div>
   </header>
 
   <div class="main-body">
-    <div class="browser-wrap">
-      <!-- Browser chrome bar -->
-      <div class="browser-chrome">
-        <div class="bdot bdot-r"></div>
-        <div class="bdot bdot-y"></div>
-        <div class="bdot bdot-g"></div>
-        <div class="b-url-bar">
+    <div class="browser-win">
+
+      <!-- Chrome bar — looks like a real desktop browser -->
+      <div class="b-chrome">
+        <div class="bd"></div><div class="bd"></div><div class="bd"></div>
+        <div class="b-url">
           <span class="b-lock">🔒</span>
           blueridgeroofing.com
         </div>
       </div>
 
-      <!-- The Blue Ridge Roofing website (mockup) -->
-      <div class="browser-viewport">
-        <div class="site-content">
-          <nav class="site-nav">
-            <div class="site-logo">
-              <div class="site-logo-mark">🏠</div>
+      <!-- The Blue Ridge Roofing website -->
+      <div class="b-viewport">
+        <div class="site-wrap">
+
+          <!-- Nav bar -->
+          <nav class="s-nav">
+            <div class="s-logo">
+              <div class="s-logo-icon">🏠</div>
               <div>
-                <div class="site-logo-name">Blue Ridge Roofing</div>
-                <div class="site-logo-sub">&amp; Restoration</div>
+                <div class="s-logo-name">Blue Ridge Roofing</div>
+                <div class="s-logo-sub">&amp; Restoration</div>
               </div>
             </div>
-            <div class="site-nav-links">
-              <span class="site-nav-link">Services</span>
-              <span class="site-nav-link">About Us</span>
-              <span class="site-nav-link">Reviews</span>
-              <span class="site-nav-link">Contact</span>
+            <div class="s-nav-links">
+              <span class="s-nav-link">Services</span>
+              <span class="s-nav-link">About</span>
+              <span class="s-nav-link">Reviews</span>
+              <span class="s-nav-phone">(540) 555-ROOF</span>
             </div>
-            <div class="site-nav-cta">Free Estimate</div>
+            <div class="s-nav-cta">Emergency Call</div>
           </nav>
 
-          <div class="site-hero">
-            <div class="site-eyebrow">Waynesboro, VA — Since 1987</div>
-            <div class="site-h1">Storm Damage? We Respond<br><em>24/7 Emergency Roofing</em></div>
-            <div class="site-sub">Licensed &amp; insured. We handle your insurance claim from first call to final nail. Free inspection, written estimate within 24 hours.</div>
-            <div class="site-cta-row">
-              <div class="site-btn-primary">Get Free Inspection</div>
-              <div class="site-btn-outline">See Our Work</div>
+          <!-- Hero section -->
+          <div class="s-hero">
+            <div>
+              <div class="s-stars">★★★★★</div>
+              <div class="s-rating-line">4.9 · 312 Google reviews · Waynesboro, VA</div>
             </div>
-            <div class="site-trust">
-              <div class="trust-item"><span>✓</span> Licensed &amp; Insured</div>
-              <div class="trust-item"><span>✓</span> 5-Star Rated</div>
-              <div class="trust-item"><span>✓</span> Free Estimates</div>
+            <div class="s-h1">Storm Damage?<br><em>24/7 Emergency Response</em></div>
+            <div class="s-sub">Licensed &amp; insured. We work directly with your insurance company. Free inspection — written estimate within 24 hours.</div>
+            <div class="s-cta-row">
+              <div class="s-btn-red">🚨 Emergency Service</div>
+              <div class="s-btn-ghost">See Our Work</div>
+            </div>
+            <div class="s-trust-row">
+              <div class="s-trust-item"><span>✓</span> Licensed &amp; Insured</div>
+              <div class="s-trust-item"><span>✓</span> A+ BBB Rating</div>
+              <div class="s-trust-item"><span>✓</span> 25-Year Warranty</div>
+              <div class="s-trust-item"><span>✓</span> Free Estimates</div>
             </div>
           </div>
-        </div>
 
-        <!-- Ava chat widget — lower-right of browser viewport -->
-        <div class="ava-widget-wrap">
-          <div class="ava-chat-panel" id="ava-panel">
-            <div class="ava-panel-header">
-              <div class="ava-avatar-sm">🤖</div>
+        </div><!-- /site-wrap -->
+
+        <!-- ── Ava chat widget — lower-right of browser viewport ── -->
+        <div class="ava-wrap">
+
+          <!-- Chat panel — 3 pre-built states, toggled by JS -->
+          <div class="ava-panel" id="ava-panel">
+            <!-- Panel header -->
+            <div class="ava-ph">
+              <div class="ava-av">🤖</div>
               <div>
-                <div class="ava-panel-name">Ava</div>
-                <div class="ava-panel-status"><div class="ava-panel-dot"></div> Online now</div>
+                <div class="ava-ph-name">Ava · Blue Ridge Roofing</div>
+                <div class="ava-ph-status"><div class="ava-ph-dot"></div>Online — typically replies instantly</div>
               </div>
             </div>
-            <div class="ava-messages" id="ava-msgs"></div>
-          </div>
+            <!-- Panel body with states -->
+            <div class="ava-body">
+
+              <!-- STATE 1: How can we help? -->
+              <div class="ws active" id="ws1">
+                <div class="ws-how">How can we help you?</div>
+                <div class="ws-opt" id="ws-opt0">🚨 Emergency Roof Leak</div>
+                <div class="ws-opt" id="ws-opt1">🔍 Get a Free Estimate</div>
+                <div class="ws-opt" id="ws-opt2">📅 Schedule Inspection</div>
+              </div>
+
+              <!-- STATE 2: Phone capture -->
+              <div class="ws" id="ws2">
+                <div class="ws-tag">🚨 Emergency Roof Leak</div>
+                <div class="ws-lbl">Best number to reach you?</div>
+                <div class="ws-phone-wrap">
+                  <span class="ws-phone-txt" id="phone-txt"></span><span class="ws-cursor" id="phone-cur">|</span>
+                </div>
+              </div>
+
+              <!-- STATE 3: Confirmation -->
+              <div class="ws" id="ws3">
+                <div class="ws-confirm">
+                  <div class="ws-ci">✓</div>
+                  <div>
+                    <div class="ws-ct">Emergency team alerted</div>
+                    <div class="ws-cs">Someone will call you at (540) 771-2284 shortly.</div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /ava-body -->
+          </div><!-- /ava-panel -->
+
+          <!-- FAB button -->
           <div class="ava-fab" id="ava-fab">
             💬
             <div class="ava-fab-dot"></div>
           </div>
-        </div>
-      </div><!-- /browser-viewport -->
-    </div><!-- /browser-wrap -->
+
+        </div><!-- /ava-wrap -->
+      </div><!-- /b-viewport -->
+    </div><!-- /browser-win -->
+  </div><!-- /main-body -->
+
+  <div class="main-foot">
+    <button class="start-btn" id="start-btn">▶ Watch Demo</button>
   </div>
+</div><!-- /s-main -->
 
-  <footer class="chapter-footer">
-    <button class="continue-btn" id="start-btn">▶ Watch Demo</button>
-  </footer>
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     SCREEN 2 — Automation
-════════════════════════════════════════════════════ -->
-<div class="screen" id="s-auto">
-  <header class="global-header">
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 2 — Automation checklist + CRM result card
+═══════════════════════════════════════════════════════ -->
+<div class="screen" id="s-result">
+  <header class="hdr">
     <div class="apex-brand">
       <div class="apex-mark">A</div>
       <div>
-        <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Website Receptionist</div>
+        <div class="apex-name">Apex AI Systems</div>
+        <div class="apex-sub">Website Receptionist</div>
       </div>
     </div>
-    <div class="nar-bar">
-      <div class="apex-eq"><span></span><span></span><span></span><span></span></div>
-      Routing emergency lead
-    </div>
+    <div class="hdr-pill"><div class="hdr-dot"></div> GHL CRM Updated</div>
   </header>
 
-  <div class="auto-body">
-    <div class="auto-label">
-      <div class="auto-label-dot"></div>
-      Automation Triggered
-    </div>
-    <div class="auto-steps">
-      <div class="auto-step" id="st-0">
-        <div class="auto-icon">👤</div>
-        <div class="auto-text">
-          <div class="auto-title">Contact Created</div>
-          <div class="auto-desc" id="st-0-desc">Adding Sarah Miller to GHL CRM…</div>
-        </div>
-        <div class="auto-check">✓</div>
-      </div>
-      <div class="auto-step" id="st-1">
-        <div class="auto-icon">🚨</div>
-        <div class="auto-text">
-          <div class="auto-title">Emergency Route Selected</div>
-          <div class="auto-desc" id="st-1-desc">Priority: HIGH — Emergency Response Team</div>
-        </div>
-        <div class="auto-check">✓</div>
-      </div>
-      <div class="auto-step" id="st-2">
-        <div class="auto-icon">💬</div>
-        <div class="auto-text">
-          <div class="auto-title">SMS Confirmation Sent</div>
-          <div class="auto-desc" id="st-2-desc">Automated text dispatched to (540) 771-2284</div>
-        </div>
-        <div class="auto-check">✓</div>
-      </div>
-      <div class="auto-step" id="st-3">
-        <div class="auto-icon">📋</div>
-        <div class="auto-text">
-          <div class="auto-title">Team Notified</div>
-          <div class="auto-desc" id="st-3-desc">Field crew dispatched — ETA confirmed</div>
-        </div>
-        <div class="auto-check">✓</div>
-      </div>
-    </div>
-  </div>
-</div>
+  <div class="res-body">
 
-<!-- ══════════════════════════════════════════════════
-     SCREEN 3 — CRM result + live widget proof
-════════════════════════════════════════════════════ -->
-<div class="screen" id="s-summary">
-  <header class="global-header">
-    <div class="apex-brand">
-      <div class="apex-mark">A</div>
-      <div>
-        <div class="apex-brand-text">Apex AI Systems</div>
-        <div class="apex-brand-sub">Website Receptionist</div>
+    <!-- 2×2 automation badge grid -->
+    <div class="auto-grid">
+      <div class="ab" id="ab0">
+        <div class="ab-icon">👤</div>
+        <div class="ab-wrap">
+          <div class="ab-title">Contact Created</div>
+          <div class="ab-sub">Sarah Miller → GHL CRM</div>
+        </div>
+        <div class="ab-ck">✓</div>
+      </div>
+      <div class="ab" id="ab1">
+        <div class="ab-icon">🚨</div>
+        <div class="ab-wrap">
+          <div class="ab-title">Emergency Route</div>
+          <div class="ab-sub">Priority HIGH selected</div>
+        </div>
+        <div class="ab-ck">✓</div>
+      </div>
+      <div class="ab" id="ab2">
+        <div class="ab-icon">💬</div>
+        <div class="ab-wrap">
+          <div class="ab-title">SMS Confirmation</div>
+          <div class="ab-sub">Sent to (540) 771-2284</div>
+        </div>
+        <div class="ab-ck">✓</div>
+      </div>
+      <div class="ab" id="ab3">
+        <div class="ab-icon">📋</div>
+        <div class="ab-wrap">
+          <div class="ab-title">Team Notified</div>
+          <div class="ab-sub">Field crew dispatched</div>
+        </div>
+        <div class="ab-ck">✓</div>
       </div>
     </div>
-    <div class="client-pill">
-      <div class="status-dot"></div>
-      GHL CRM Updated
-    </div>
-  </header>
-
-  <div class="summary-body">
 
     <!-- CRM result card -->
-    <div class="rr-card apex-cpan-pre" id="crm-card">
-      <div class="rr-card-header">
-        <div class="rr-avatar">👤</div>
-        <div class="rr-contact-info">
-          <div class="rr-name">Sarah Miller</div>
-          <div class="rr-sub">New contact · Website chat · Just now</div>
+    <div class="crm" id="crm-card">
+      <div class="crm-hd">
+        <div class="crm-av">👤</div>
+        <div style="flex:1;min-width:0;">
+          <div class="crm-name">Sarah Miller</div>
+          <div class="crm-sub">New contact · Website chat · Just now</div>
         </div>
-        <div class="rr-badge">
-          <div class="rr-badge-dot"></div>
+        <div class="crm-badge">
+          <div class="crm-badge-dot"></div>
           Priority High
         </div>
       </div>
-      <div class="rr-fields">
-        <div class="rr-field">
-          <div class="rr-field-label">Service Type</div>
-          <div class="rr-field-value val-red">Emergency Roof Leak</div>
+      <div class="crm-fields">
+        <div class="crm-row">
+          <div class="crm-lbl">Service Type</div>
+          <div class="crm-val v-red">Emergency Roof Leak</div>
         </div>
-        <div class="rr-divider"></div>
-        <div class="rr-field">
-          <div class="rr-field-label">Pipeline</div>
-          <div class="rr-field-value">Emergency Repair</div>
+        <div class="crm-div"></div>
+        <div class="crm-row">
+          <div class="crm-lbl">Pipeline</div>
+          <div class="crm-val">Emergency Repair</div>
         </div>
-        <div class="rr-field">
-          <div class="rr-field-label">Phone</div>
-          <div class="rr-field-value">(540) 771-2284</div>
+        <div class="crm-row">
+          <div class="crm-lbl">Phone</div>
+          <div class="crm-val">(540) 771-2284</div>
         </div>
-        <div class="rr-divider"></div>
-        <div class="rr-field">
-          <div class="rr-field-label">SMS Confirmation</div>
-          <div class="rr-field-value val-check">Sent</div>
-        </div>
-        <div class="rr-field">
-          <div class="rr-field-label">Team Notified</div>
-          <div class="rr-field-value val-check">Confirmed</div>
+        <div class="crm-div"></div>
+        <div class="crm-row">
+          <div class="crm-lbl">Next Action</div>
+          <div class="crm-val v-check">SMS Sent + Team Notified</div>
         </div>
       </div>
-      <div class="rr-value-row">
-        <div class="rr-value-label">Estimated Opportunity</div>
-        <div class="rr-value-amount" id="job-value">$0</div>
+      <div class="crm-foot">
+        <div class="crm-foot-lbl">Estimated Opportunity</div>
+        <div class="crm-amount" id="crm-amount">$0</div>
       </div>
     </div>
 
-    <!-- Stats pills -->
-    <div class="stats-row apex-cpan-pre" id="stats-row">
-      <div class="stat-pill">
-        <div class="stat-pill-val" id="stat-0">0</div>
-        <div class="stat-pill-lab">Hrs Response</div>
-      </div>
-      <div class="stat-pill">
-        <div class="stat-pill-val">&lt;5s</div>
-        <div class="stat-pill-lab">First Reply</div>
-      </div>
-      <div class="stat-pill">
-        <div class="stat-pill-val">24/7</div>
-        <div class="stat-pill-lab">Always On</div>
-      </div>
+  </div><!-- /res-body -->
+
+  <div class="res-foot">
+    <div class="live-proof">
+      <div class="live-dot"></div>
+      Live on blueridgeroofing.com
     </div>
+    <button class="cont-btn" id="cont-btn">Continue →</button>
+  </div>
 
-    <!-- Live GHL widget visual proof (replica — no script, no duplicate) -->
-    <div class="live-reveal" id="live-reveal">
-      <div class="live-badge"><div class="live-badge-dot"></div> LIVE WIDGET</div>
-      <div class="live-fab">
-        💬
-        <div class="live-fab-dot"></div>
-      </div>
-    </div>
+</div><!-- /s-result -->
 
-  </div><!-- /summary-body -->
-
-  <footer class="chapter-footer">
-    <button class="continue-btn" id="continue-btn">Continue →</button>
-  </footer>
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     APEX MINI-FILM LAYER
-     DEMO / SIMULATION MODE — no real SMS sent,
-     no real calls placed, no real data stored.
-════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     APEX MINI-FILM LAYER — IIFE
+     DEMO / SIMULATION MODE. No real SMS sent.
+     No real data stored. All timers < 4s post-narration.
+═══════════════════════════════════════════════════════ -->
 <script>
 (function(){
   'use strict';
 
-  /* ── Config ─────────────────────────────────────────────── */
-  var CFG = {
-    narSrc:    'https://shodkay87.github.io/apex-narration/websitechat.mp3',
-    summaryId: 's-summary',
-    autoId:    's-auto',
-    mainId:    's-main'
-  };
+  /* ── Config ───────────────────────────────────────────── */
+  var NAR_SRC   = 'https://shodkay87.github.io/apex-narration/websitechat.mp3';
+  var CONT_TGT  = 'speed-to-lead';
+  var PHONE_STR = '(540) 771-2284';
+  var JOB_VAL   = 18400;
 
-  /* ── Camera-pan CSS (kills rr-in animation, applies pan classes) */
-  (function(){
-    var st = document.createElement('style');
-    st.textContent =
-      '#s-summary .rr-card,#s-summary .stats-row{animation:none!important;}' +
-      '.apex-cpan-pre{opacity:0!important;transform:translateY(38px)!important;transition:none!important;}' +
-      '.apex-cpan-in{opacity:1!important;transform:translateY(0)!important;' +
-        'transition:opacity 0.75s cubic-bezier(0.16,1,0.3,1),transform 0.75s cubic-bezier(0.16,1,0.3,1)!important;}';
-    document.head.appendChild(st);
-  })();
+  /* ── DOM refs ─────────────────────────────────────────── */
+  var fab       = document.getElementById('ava-fab');
+  var panel     = document.getElementById('ava-panel');
+  var ws1       = document.getElementById('ws1');
+  var ws2       = document.getElementById('ws2');
+  var ws3       = document.getElementById('ws3');
+  var phoneTxt  = document.getElementById('phone-txt');
+  var phoneCur  = document.getElementById('phone-cur');
+  var opt0      = document.getElementById('ws-opt0');
+  var startBtn  = document.getElementById('start-btn');
+  var contBtn   = document.getElementById('cont-btn');
+  var crmCard   = document.getElementById('crm-card');
+  var crmAmt    = document.getElementById('crm-amount');
 
-  /* ── DOM refs ───────────────────────────────────────────── */
-  var msgEl   = document.getElementById('ava-msgs');
-  var panel   = document.getElementById('ava-panel');
-  var fab     = document.getElementById('ava-fab');
-  var startBtn = document.getElementById('start-btn');
-  var contBtn  = document.getElementById('continue-btn');
-
-  /* ── State ───────────────────────────────────────────────── */
-  var nar       = null;
+  var BADGES    = ['ab0','ab1','ab2','ab3'];
   var _started  = false;
   var _timers   = [];
+  var nar       = null;
 
-  /* ── Helpers ─────────────────────────────────────────────── */
+  /* ── Helpers ──────────────────────────────────────────── */
   function st(fn, ms){ var id = setTimeout(fn, ms); _timers.push(id); return id; }
 
   function flash(cb){
@@ -851,214 +797,162 @@
     });
   }
 
-  /* ── Chat helpers ────────────────────────────────────────── */
-  function addTyping(){
-    var d = document.createElement('div');
-    d.id = '_ty'; d.className = 'msg-ava';
-    d.innerHTML = '<div class="typing-ind"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
-    msgEl.appendChild(d); msgEl.scrollTop = msgEl.scrollHeight;
-  }
-  function removeTyping(){ var t = document.getElementById('_ty'); if(t) t.parentNode.removeChild(t); }
-
-  function addMsg(cls, text, delay){
-    st(function(){
-      removeTyping();
-      var d = document.createElement('div');
-      d.className = cls;
-      var b = document.createElement('div'); b.className = 'msg-bubble'; b.textContent = text;
-      d.appendChild(b); msgEl.appendChild(d); msgEl.scrollTop = msgEl.scrollHeight;
-    }, delay);
+  /* Widget state switcher */
+  function setWS(target){
+    [ws1, ws2, ws3].forEach(function(w){ w.classList.remove('active'); });
+    target.classList.add('active');
   }
 
-  function addActions(delay){
-    st(function(){
-      removeTyping();
-      var wrap = document.createElement('div'); wrap.className = 'quick-actions'; wrap.id = 'qa-wrap';
-      ['🚨 Emergency Roof Leak','🔍 Free Estimate','📅 Schedule Inspection'].forEach(function(lbl){
-        var b = document.createElement('div'); b.className = 'qa-btn'; b.textContent = lbl;
-        wrap.appendChild(b);
-      });
-      msgEl.appendChild(wrap); msgEl.scrollTop = msgEl.scrollHeight;
-    }, delay);
+  /* Phone typewriter — 14 chars × 75ms ≈ 1050ms */
+  function typePhone(cb){
+    var i = 0;
+    phoneCur.style.display = 'inline-block';
+    function next(){
+      if(i < PHONE_STR.length){
+        phoneTxt.textContent = PHONE_STR.slice(0, ++i);
+        _timers.push(setTimeout(next, 75));
+      } else {
+        phoneCur.style.display = 'none';
+        cb && cb();
+      }
+    }
+    next();
   }
 
-  function selectAction(delay){
-    st(function(){
-      var btns = document.querySelectorAll('.qa-btn');
-      if(btns[0]) btns[0].classList.add('selected');
-    }, delay);
-  }
-
-  /* ── Chat script — ~8–9s total
-   * DEMO / SIMULATION MODE. No data is sent or stored.
-   ──────────────────────────────────────────────────── */
-  function runChatScript(){
-    var T = 0;
-
-    /* FAB pulse → open panel */
-    st(function(){ fab.classList.add('pulse'); }, T + 500);
-    st(function(){ panel.classList.add('open'); }, T + 700);
-
-    /* Ava greeting */
-    st(function(){ addTyping(); }, T + 1000);
-    addMsg('msg-ava', "Hi! I'm Ava. How can I help you today?", T + 1600);
-
-    /* Action buttons */
-    addActions(T + 2100);
-
-    /* Visitor selects Emergency Roof Leak */
-    selectAction(T + 2900);
-    addMsg('msg-user', '🚨 Emergency Roof Leak', T + 3400);
-
-    /* Ava asks about water */
-    st(function(){ addTyping(); }, T + 3800);
-    addMsg('msg-ava', "Is water actively entering your home?", T + 4400);
-
-    /* Visitor: Yes */
-    addMsg('msg-user', 'Yes — coming through the ceiling.', T + 5300);
-
-    /* Ava asks for phone */
-    st(function(){ addTyping(); }, T + 5700);
-    addMsg('msg-ava', "I've marked this as urgent. What's the best number to reach you?", T + 6300);
-
-    /* Visitor gives phone */
-    addMsg('msg-user', '(540) 771-2284', T + 7200);
-
-    /* Ava final confirmation */
-    st(function(){ addTyping(); }, T + 7600);
-    addMsg('msg-ava', "Perfect. I've alerted the Blue Ridge Roofing team and sent a confirmation by text. Someone will contact you shortly.", T + 8200);
-
-    /* → automation at T+9.4s */
-    st(function(){ runAuto(); }, T + 9400);
-  }
-
-  /* ── Automation — 4 steps in ~2s ────────────────────────── */
-  var AUTO = [
-    { id:'st-0', delay:200,  done:'Sarah Miller added to CRM' },
-    { id:'st-1', delay:620,  done:'Priority: HIGH — Emergency Response Team' },
-    { id:'st-2', delay:1050, done:'SMS sent to (540) 771-2284' },
-    { id:'st-3', delay:1480, done:'Field crew dispatched — ETA confirmed' }
-  ];
-
-  function runAuto(){
-    showScreen(CFG.autoId);
-    AUTO.forEach(function(s){
-      st(function(){
-        var el = document.getElementById(s.id);
-        if(!el) return;
-        el.style.animation = 'step-in 0.32s ease both';
-        /* after animation settles, mark done */
-        setTimeout(function(){
-          el.classList.add('done');
-          var desc = el.querySelector('.auto-desc');
-          if(desc) desc.textContent = s.done;
-        }, 200);
-      }, s.delay);
-    });
-    st(function(){ showSummary(); }, 2100);
-  }
-
-  /* ── Summary reveal with camera-pan ─────────────────────── */
-  function showSummary(){
-    /* Pre-hide before flash */
-    document.querySelectorAll('.apex-cpan-pre').forEach(function(el){
-      el.classList.remove('apex-cpan-in');
-    });
-
-    showScreen(CFG.summaryId);
-
-    /* Camera-pan in CRM card */
-    st(function(){ document.getElementById('crm-card').classList.add('apex-cpan-in'); }, 340);
-
-    /* Count up $18,400 */
-    st(function(){ countUp(document.getElementById('job-value'), 0, 18400, 1200); }, 500);
-
-    /* Count up stat 0 (response hours: 0) */
-    st(function(){ countUp(document.getElementById('stat-0'), 0, 0, 800); }, 500);
-
-    /* Camera-pan in stats row */
-    st(function(){ document.getElementById('stats-row').classList.add('apex-cpan-in'); }, 560);
-
-    /* Live widget reveal */
-    st(function(){ document.getElementById('live-reveal').classList.add('shown'); }, 1300);
-
-    /* Continue button */
-    st(function(){ contBtn.classList.add('visible'); }, 1900);
-  }
-
-  /* ── Counter animation ───────────────────────────────────── */
-  function countUp(el, from, to, duration){
-    if(!el) return;
+  /* Count-up animation for $18,400 */
+  function countUp(el, target, duration){
     var start = null;
-    var isCurrency = el.id === 'job-value';
     function step(ts){
       if(!start) start = ts;
-      var prog = Math.min((ts - start) / duration, 1);
-      var ease = 1 - Math.pow(1 - prog, 3); /* ease-out cubic */
-      var val = Math.round(from + (to - from) * ease);
-      el.textContent = isCurrency
-        ? '$' + val.toLocaleString()
-        : val.toString();
-      if(prog < 1) requestAnimationFrame(step);
+      var p = Math.min((ts - start) / duration, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = '$' + Math.round(target * ease).toLocaleString();
+      if(p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
-  /* ── Continue / postMessage ──────────────────────────────── */
-  contBtn.addEventListener('click', function(){
-    try{ parent.postMessage({ type:'apex-chapter-continue', target:'speed-to-lead' }, '*'); }
-    catch(e){}
-  });
+  /* ── Phase 1: Widget 3-beat chat (s-main) ─────────────
+   * Total: ~3.5s from narration end to showResult()
+   * DEMO / SIMULATION MODE. No real data sent.
+   ──────────────────────────────────────────────────── */
+  function runChat(){
+    /* FAB pulse */
+    st(function(){ fab.classList.add('pulse'); }, 0);
 
-  /* ── Narration ───────────────────────────────────────────── */
-  function setupNarration(){
-    nar = new Audio(CFG.narSrc);
+    /* Panel opens: state-1 (option buttons) */
+    st(function(){ panel.classList.add('open'); }, 300);
+
+    /* "Emergency Roof Leak" highlights */
+    st(function(){ opt0.classList.add('sel'); }, 900);
+
+    /* → state-2: phone field */
+    st(function(){
+      setWS(ws2);
+      typePhone(function(){
+        /* typing done → state-3: confirmation */
+        st(function(){ setWS(ws3); }, 200);
+      });
+    }, 1400);
+
+    /* → result screen at T+3.5s */
+    st(function(){ showResult(); }, 3500);
+  }
+
+  /* ── Phase 2: Result screen (s-result) ────────────────
+   * Badges cascade × 4 → CRM card reveals → continue
+   ──────────────────────────────────────────────────── */
+  function showResult(){
+    showScreen('s-result');
+
+    /* Automation badges: 200ms intervals */
+    var badgeDelay = 200;
+    BADGES.forEach(function(id, i){
+      var d = badgeDelay + i * 220;
+      st(function(){
+        var el = document.getElementById(id);
+        if(!el) return;
+        el.style.animation = 'slide-in-x 0.28s ease both';
+        setTimeout(function(){ el.classList.add('done'); }, 160);
+      }, d);
+    });
+
+    /* CRM card camera-pan reveal */
+    st(function(){ crmCard.classList.add('revealed'); }, 1100);
+
+    /* Count-up $18,400 */
+    st(function(){ countUp(crmAmt, JOB_VAL, 1100); }, 1200);
+
+    /* Continue button */
+    st(function(){ contBtn.classList.add('vis'); }, 1800);
+  }
+
+  /* ── Continue / postMessage ──────────────────────────
+   * Posts to parent AND top to handle nested iframe contexts
+   * (e.g. chapter → master page → Framer)
+   ──────────────────────────────────────────────────── */
+  function doNavigate(){
+    var msg = { type: 'apex-chapter-continue', target: CONT_TGT };
+    try { parent.postMessage(msg, '*'); } catch(e){}
+    try { if(window.top !== window.parent) top.postMessage(msg, '*'); } catch(e){}
+    /* Visual feedback on the button itself */
+    contBtn.textContent = 'Loading…';
+    setTimeout(function(){ contBtn.textContent = 'Continue →'; }, 1200);
+  }
+
+  contBtn.addEventListener('click', doNavigate);
+  contBtn.addEventListener('touchend', function(e){ e.preventDefault(); doNavigate(); });
+
+  /* ── Narration + start ───────────────────────────────── */
+  function setupAudio(){
+    nar = new Audio(NAR_SRC);
     nar.preload = 'auto';
     nar.volume  = 1;
-    nar.addEventListener('ended', function(){ runChatScript(); });
+
+    nar.addEventListener('ended', function(){ runChat(); });
+
+    /* Fallback: if audio errors, still run the scene */
     nar.addEventListener('error', function(){
-      /* Fallback: run chat if audio fails (404, network, blocked) */
-      setTimeout(runChatScript, 600);
+      if(_started) setTimeout(runChat, 400);
     });
   }
 
   function startDemo(){
     if(_started) return;
     _started = true;
-
     startBtn.style.display = 'none';
 
     if(nar){
       var p = nar.play();
       if(p !== undefined){
         p.catch(function(){
-          /* Autoplay blocked — proceed directly */
-          setTimeout(runChatScript, 600);
+          /* Autoplay blocked → run scene directly */
+          setTimeout(runChat, 400);
         });
       }
     } else {
-      setTimeout(runChatScript, 600);
+      setTimeout(runChat, 400);
     }
   }
 
-  /* ── Pause / resume from parent ─────────────────────────── */
+  /* ── Pause / resume from parent ─────────────────────── */
   window.addEventListener('message', function(e){
-    if(!e.data) return;
-    if(e.data.type === 'apex-pause' && nar && !nar.paused) nar.pause();
+    if(!e || !e.data) return;
+    if(e.data.type === 'apex-pause'  && nar && !nar.paused) nar.pause();
     if(e.data.type === 'apex-resume' && nar && nar.paused && _started) nar.play().catch(function(){});
   });
 
-  /* ── Reduced motion guard ────────────────────────────────── */
+  /* ── Reduced-motion guard ───────────────────────────── */
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches){
-    var injStyle = document.createElement('style');
-    injStyle.textContent = '*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}';
-    document.head.appendChild(injStyle);
+    var rm = document.createElement('style');
+    rm.textContent = '*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}';
+    document.head.appendChild(rm);
   }
 
-  /* ── Init ───────────────────────────────────────────────── */
+  /* ── Init ───────────────────────────────────────────── */
   window.addEventListener('DOMContentLoaded', function(){
-    setupNarration();
-    startBtn.classList.add('visible');
+    setupAudio();
+    startBtn.classList.add('vis');
     startBtn.addEventListener('click', startDemo);
   });
 
