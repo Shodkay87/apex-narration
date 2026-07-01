@@ -883,8 +883,8 @@
     /* Count-up $18,400 */
     st(function(){ countUp(crmAmt, JOB_VAL, 1100); }, 1200);
 
-    /* Continue button */
-    st(function(){ contBtn.classList.add('vis'); }, 1800);
+    /* Continue button — 4s hold after result card appears (~T+1200ms) */
+    st(function(){ contBtn.classList.add('vis'); }, 5800);
   }
 
   /* ── Continue / postMessage ──────────────────────────
