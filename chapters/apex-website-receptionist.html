@@ -888,20 +888,21 @@
   }
 
   /* ── Continue / postMessage ──────────────────────────
-   * Posts to parent AND top to handle nested iframe contexts
-   * (e.g. chapter → master page → Framer)
+   * Mirrors the speed-to-lead pattern:
+   * 1. postMessage to parent  2. Framer hash fallback  3. local scroll
    ──────────────────────────────────────────────────── */
-  function doNavigate(){
-    var msg = { type: 'apex-chapter-continue', target: CONT_TGT };
-    try { parent.postMessage(msg, '*'); } catch(e){}
-    try { if(window.top !== window.parent) top.postMessage(msg, '*'); } catch(e){}
-    /* Visual feedback on the button itself */
-    contBtn.textContent = 'Loading…';
-    setTimeout(function(){ contBtn.textContent = 'Continue →'; }, 1200);
+  function apexContinue(target){
+    try{ if(window.parent && window.parent!==window){ window.parent.postMessage({type:"apex-chapter-continue", target:target}, "*"); } }catch(e){}
+    /* Fallback: jump the parent page to its #target section anchor (Framer "Scroll Section" name). */
+    try{ if(window.top && window.top!==window){ window.top.location.hash = target; } }catch(e){
+      try{ if(window.parent && window.parent!==window){ window.parent.location.hash = target; } }catch(e2){}
+    }
+    var local = document.getElementById(target) || document.querySelector('[data-apex-section="'+target+'"]');
+    if(local && local.scrollIntoView){ local.scrollIntoView({behavior:"smooth", block:"start"}); }
   }
 
-  contBtn.addEventListener('click', doNavigate);
-  contBtn.addEventListener('touchend', function(e){ e.preventDefault(); doNavigate(); });
+  contBtn.addEventListener('click', function(){ apexContinue(CONT_TGT); });
+  contBtn.addEventListener('touchend', function(e){ e.preventDefault(); apexContinue(CONT_TGT); });
 
   /* ── Narration + start ───────────────────────────────── */
   function setupAudio(){
